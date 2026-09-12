@@ -43,11 +43,13 @@ function toDonation(row: DonationRow): Donation {
   }
 }
 
+const DONATION_SELECT = 'id,restaurant_id,restaurant_name,food_type,meals,available_until,pickup_location,description,status,claimed_by,claimed_by_name,lat,lng,created_at'
+
 export async function fetchDonations(): Promise<Donation[]> {
   if (!supabase) throw new Error('Supabase is not configured yet. Add your credentials in .env.')
   const { data, error } = await supabase
     .from('donations')
-    .select('*')
+    .select(DONATION_SELECT)
     .order('created_at', { ascending: false })
     .limit(200)
   if (error) throw error
@@ -58,9 +60,10 @@ export async function fetchRestaurantDonations(restaurantId: string): Promise<Do
   if (!supabase) throw new Error('Supabase is not configured yet. Add your credentials in .env.')
   const { data, error } = await supabase
     .from('donations')
-    .select('*')
+    .select(DONATION_SELECT)
     .eq('restaurant_id', restaurantId)
     .order('created_at', { ascending: false })
+    .limit(200)
   if (error) throw error
   return (data ?? []).map(toDonation)
 }

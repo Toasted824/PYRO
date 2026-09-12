@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 import { motion, AnimatePresence, LayoutGroup } from 'motion/react'
 import { useAuth } from '../../lib/auth'
 import { claimDonation } from '../../lib/store'
@@ -17,6 +17,10 @@ function fmtUntil(iso: string) {
 function kmAway(d: Donation) {
   return distanceFromCenter(d.lat, d.lng).toFixed(1)
 }
+// precompute distances once per donations array to avoid haversine per compare
+function withDistance(list: Donation[]) {
+  return list.map(d => ({ d, dist: distanceFromCenter(d.lat, d.lng) }))
+}
 
 export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
   const { user, configured } = useAuth()
@@ -32,7 +36,9 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
       const q = search.toLowerCase()
       list = list.filter(d => d.foodType.toLowerCase().includes(q) || d.restaurantName.toLowerCase().includes(q) || d.pickupLocation.toLowerCase().includes(q))
     }
-    return list.sort((a,b)=> distanceFromCenter(a.lat,a.lng) - distanceFromCenter(b.lat,b.lng))
+    const withDist = withDistance(list)
+    withDist.sort((a,b)=> a.dist - b.dist)
+    return withDist.map(x => x.d)
   }, [donations, search])
 
   const myClaimed = useMemo(() => {
@@ -48,7 +54,7 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
   const selected = donations.find(d=> d.id === selectedId) || null
   const list = tab === 'claimed' ? myClaimed : available
 
-  const claim = async (d: Donation) => {
+  const claim = useCallback(async (d: Donation) => {
     if (publicMode) {
       pushToast('Please log in as Beneficiary to claim food', 'info')
       return
@@ -67,7 +73,7 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
     } finally {
       setClaiming(false)
     }
-  }
+  }, [publicMode, user, reload])
 
   return (
     <div className="min-h-screen bg-[#FFFBEB] flex flex-col">

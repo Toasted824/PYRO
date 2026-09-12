@@ -2,22 +2,16 @@
 // Keep props contract stable: donations[], onMarkerClick(id), selectedId.
 // Current impl: Leaflet + Carto Light (muted, low visual noise) — less buggy, less clutter.
 
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import Supercluster from 'supercluster'
 import type { Donation } from '../../lib/types'
-import { useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CENTER } from '../../lib/distance'
 import { cartoTileUrl, cartoErrorTileUrl } from '../../lib/carto'
 
-// Fix default icon once (outside component to avoid flash)
- // @ts-expect-error leaflet internals
-delete L.Icon.Default.prototype._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-})
+// Custom DivIcons only — no default marker fetch (avoids extra unpkg DNS/TLS)
 
 const iconCache = new Map<string, L.DivIcon>()
 function iconFor(status: Donation['status']) {
@@ -37,6 +31,127 @@ const selectedIcon = L.divIcon({
   iconSize: [34, 34],
   iconAnchor: [17, 17],
 })
+
+const clusterIconCache = new Map<number, L.DivIcon>()
+function clusterIcon(count: number) {
+  const cached = clusterIconCache.get(count)
+  if (cached) return cached
+  const size = count < 10 ? 36 : count < 25 ? 42 : 48
+  const html = `<div style="width:${size}px;height:${size}px;background:#16A34A;border:3px solid white;border-radius:50%;box-shadow:0 6px 16px rgba(0,0,0,0.22);display:grid;place-items:center;color:white;font-weight:800;font-size:${count < 10 ? 14 : 13}px">${count}</div>`
+  const icon = L.divIcon({ html, className: '', iconSize: [size, size], iconAnchor: [size / 2, size / 2] })
+  clusterIconCache.set(count, icon)
+  return icon
+}
+
+type ClusterFeature = {
+  type: 'Feature'
+  geometry: { type: 'Point'; coordinates: [number, number] }
+  properties: { cluster?: boolean; cluster_id?: number; point_count?: number; donationId?: string }
+}
+
+function ClusterLayer({ donations, onMarkerClick, selectedId }: { donations: Donation[]; onMarkerClick?: (id: string) => void; selectedId?: string | null }) {
+  const map = useMap()
+  const [zoom, setZoom] = useState(() => map.getZoom())
+  const [bounds, setBounds] = useState<[number, number, number, number]>(() => {
+    const b = map.getBounds()
+    return [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()]
+  })
+
+  const index = useMemo(() => {
+    const sc = new Supercluster({ radius: 56, maxZoom: 16, minPoints: 2 })
+    const points: ClusterFeature[] = donations.map(d => ({
+      type: 'Feature' as const,
+      geometry: { type: 'Point' as const, coordinates: [d.lng, d.lat] as [number, number] },
+      properties: { donationId: d.id },
+    }))
+    sc.load(points as never)
+    return sc
+  }, [donations])
+
+  const update = useCallback(() => {
+    setZoom(map.getZoom())
+    const b = map.getBounds()
+    setBounds([b.getWest(), b.getSouth(), b.getEast(), b.getNorth()])
+  }, [map])
+
+  useMapEvents({
+    moveend: update,
+    zoomend: update,
+  })
+
+  useEffect(() => { update() }, [update, donations])
+
+  const clusters = useMemo(() => {
+    try {
+      return index.getClusters(bounds, Math.round(zoom)) as ClusterFeature[]
+    } catch {
+      return []
+    }
+  }, [index, bounds, zoom])
+
+  const donationById = useMemo(() => {
+    const m = new Map<string, Donation>()
+    donations.forEach(d => m.set(d.id, d))
+    return m
+  }, [donations])
+
+  return (
+    <>
+      {clusters.map(feat => {
+        const [lng, lat] = feat.geometry.coordinates
+        const isCluster = !!feat.properties.cluster
+        if (isCluster) {
+          const count = feat.properties.point_count!
+          const id = feat.properties.cluster_id!
+          return (
+            <Marker
+              key={`c-${id}`}
+              position={[lat, lng]}
+              icon={clusterIcon(count)}
+              eventHandlers={{
+                click: () => {
+                  try {
+                    const expansionZoom = Math.min(index.getClusterExpansionZoom(id), 16)
+                    map.flyTo([lat, lng], expansionZoom, { duration: 0.5 })
+                  } catch {
+                    map.flyTo([lat, lng], Math.min(zoom + 2, 16), { duration: 0.5 })
+                  }
+                },
+              }}
+            />
+          )
+        }
+        const donationId = feat.properties.donationId!
+        const d = donationById.get(donationId)
+        if (!d) return null
+        return (
+          <Marker
+            key={d.id}
+            position={[d.lat, d.lng]}
+            icon={selectedId === d.id ? selectedIcon : iconFor(d.status)}
+            eventHandlers={{ click: () => onMarkerClick?.(d.id) }}
+            keyboard
+            title={`${d.restaurantName} — ${d.foodType}, ${d.meals} meals`}
+          >
+            <Popup autoPan maxWidth={260} closeButton>
+              <div className="text-sm min-w-[180px]">
+                <div className="font-bold text-stone-900">{d.restaurantName}</div>
+                <div className="text-stone-600">{d.foodType} • {d.meals} meals</div>
+                <div className="text-xs text-stone-500">{d.pickupLocation}</div>
+                <button
+                  onClick={() => onMarkerClick?.(d.id)}
+                  className="mt-2 w-full bg-[#16A34A] hover:bg-[#15803D] text-white text-xs font-medium py-1.5 rounded-lg transition-colors"
+                >
+                  View details
+                </button>
+              </div>
+            </Popup>
+          </Marker>
+        )
+      })}
+    </>
+  )
+}
 
 function MapController({ selectedId, donations }: { selectedId?: string | null; donations: Donation[] }) {
   const map = useMap()
@@ -105,30 +220,7 @@ export function TeammateMap({
           errorTileUrl={cartoErrorTileUrl('light_all')}
         />
         <MapController selectedId={selectedId} donations={donations} />
-        {donations.map((d) => (
-          <Marker
-            key={d.id}
-            position={[d.lat, d.lng]}
-            icon={selectedId === d.id ? selectedIcon : iconFor(d.status)}
-            eventHandlers={{ click: () => onMarkerClick?.(d.id) }}
-            keyboard
-            title={`${d.restaurantName} — ${d.foodType}, ${d.meals} meals`}
-          >
-            <Popup autoPan maxWidth={260} closeButton>
-              <div className="text-sm min-w-[180px]">
-                <div className="font-bold text-stone-900">{d.restaurantName}</div>
-                <div className="text-stone-600">{d.foodType} • {d.meals} meals</div>
-                <div className="text-xs text-stone-500">{d.pickupLocation}</div>
-                <button
-                  onClick={() => onMarkerClick?.(d.id)}
-                  className="mt-2 w-full bg-[#16A34A] hover:bg-[#15803D] text-white text-xs font-medium py-1.5 rounded-lg transition-colors"
-                >
-                  View details
-                </button>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        <ClusterLayer donations={donations} onMarkerClick={onMarkerClick} selectedId={selectedId} />
       </MapContainer>
       <div className="absolute top-3 left-3 bg-white/95 backdrop-blur rounded-full px-3.5 py-1.5 text-xs font-medium shadow-sm border border-stone-200 flex items-center gap-2">
         <span className="w-2 h-2 rounded-full bg-leaf relative leaf-pulse" aria-hidden="true" /> {availableCount} available nearby

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { useAuth } from '../../lib/auth'
@@ -33,15 +33,15 @@ export function RestaurantDashboard() {
 
   if (initializing || !user) return null
 
-  const myDonations = donations.filter(d => d.restaurantId === user.id).sort(
+  const myDonations = useMemo(() => donations.filter(d => d.restaurantId === user.id).sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  )
+  ), [donations, user.id])
 
-  const mealsShared = myDonations
+  const mealsShared = useMemo(() => myDonations
     .filter(d => d.status === 'CLAIMED' || d.status === 'PICKED_UP')
-    .reduce((a, b) => a + b.meals, 0)
+    .reduce((a, b) => a + b.meals, 0), [myDonations])
 
-  const advance = async (d: Donation) => {
+  const advance = useCallback(async (d: Donation) => {
     const order: Donation['status'][] = ['AVAILABLE', 'CLAIMED', 'PICKED_UP']
     // Normalize legacy statuses (PICKUP/DELIVERED -> PICKED_UP) for index lookup
     const raw = d.status as unknown as string
@@ -55,9 +55,9 @@ export function RestaurantDashboard() {
     } catch (e: unknown) {
       pushToast(e instanceof Error ? e.message : 'Update failed — please run 0002_merge_pickup_delivered.sql', 'info')
     }
-  }
+  }, [reload])
 
-  const remove = async (d: Donation) => {
+  const remove = useCallback(async (d: Donation) => {
     if (confirmingId !== d.id) {
       setConfirmingId(d.id)
       return
@@ -70,7 +70,7 @@ export function RestaurantDashboard() {
     } catch (e: unknown) {
       pushToast(e instanceof Error ? e.message : 'Delete failed', 'info')
     }
-  }
+  }, [confirmingId, reload])
 
   return (
     <div className="min-h-screen bg-[#FFFBEB]">

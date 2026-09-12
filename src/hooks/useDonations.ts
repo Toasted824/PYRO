@@ -21,7 +21,8 @@ export function useDonations(restaurantId?: string) {
 
   useEffect(() => {
     let cancelled = false
-    const run = async () => {
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null
+    const fetchOnce = async () => {
       try {
         setLoading(true)
         const data = restaurantId ? await fetchRestaurantDonations(restaurantId) : await fetchDonations()
@@ -35,13 +36,18 @@ export function useDonations(restaurantId?: string) {
         if (!cancelled) setLoading(false)
       }
     }
-    run()
-    const unsubscribe = subscribeToDonations(run)
+    fetchOnce()
+    const onChange = () => {
+      if (debounceTimer) clearTimeout(debounceTimer)
+      debounceTimer = setTimeout(() => { fetchOnce() }, 350)
+    }
+    const unsubscribe = subscribeToDonations(onChange)
     return () => {
       cancelled = true
+      if (debounceTimer) clearTimeout(debounceTimer)
       unsubscribe()
     }
-  }, [load])
+  }, [restaurantId, load])
 
   return { donations, loading, error, reload: load }
 }

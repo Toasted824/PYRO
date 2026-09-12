@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, type ReactNode } from 'react'
 import { supabase, isSupabaseConfigured } from './supabase'
 import type { Role, User } from './types'
 
@@ -85,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const login = async (email: string, password: string, expectedRole?: Role) => {
+  const login = useCallback(async (email: string, password: string, expectedRole?: Role) => {
     if (!supabase) throw new Error(NOT_CONFIGURED)
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error || !data.user) throw new Error(mapAuthError(error?.message ?? 'Login failed'))
@@ -96,9 +96,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     setUser(u)
     return u
-  }
+  }, [])
 
-  const register = async (data: RegisterData) => {
+  const register = useCallback(async (data: RegisterData) => {
     if (!supabase) throw new Error(NOT_CONFIGURED)
     const { data: res, error } = await supabase.auth.signUp({
       email: data.email,
@@ -121,15 +121,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     throw new EmailConfirmationError(
       `Account created for ${data.email}. Check your inbox to confirm your email, then log in.`,
     )
-  }
+  }, [])
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     if (supabase) await supabase.auth.signOut()
     setUser(null)
-  }
+  }, [])
+
+  const value = useMemo(() => ({ user, initializing, configured: isSupabaseConfigured, login, register, logout }), [user, initializing, login, register, logout])
 
   return (
-    <Ctx.Provider value={{ user, initializing, configured: isSupabaseConfigured, login, register, logout }}>
+    <Ctx.Provider value={value}>
       {children}
     </Ctx.Provider>
   )
