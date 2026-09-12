@@ -186,49 +186,48 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
           </div>
         </div>
 
-        {/* RIGHT — map + overlay details */}
-        <div className="flex-1 p-3 sm:p-4 bg-[#FFFBEB] flex flex-col gap-3 lg:h-[calc(100vh-116px)] lg:overflow-hidden relative">
-          <div className="flex-1 min-h-[460px] relative rounded-2xl overflow-hidden">
-            <TeammateMap donations={available} onMarkerClick={setSelectedId} selectedId={selectedId} />
-
-            {/* overlay details sheet — floating, less clutter than stacked card */}
-            <AnimatePresence>
-              {selected ? (
-                <motion.div
-                  key={selected.id}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 12 }}
-                  transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-                  className="absolute bottom-3 left-3 right-3 bg-white rounded-2xl border border-stone-200 shadow-[0_12px_32px_rgba(0,0,0,0.14)] p-4 sm:p-5"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 text-[11px] font-semibold tracking-widest text-stone-400">DONATION DETAILS <span className={`ml-1 px-2 py-0.5 rounded-full border text-[10px] ${selected.status==='AVAILABLE' ? 'bg-[#F0FDF4] border-green-200 text-leaf' : 'bg-stone-50 border-stone-200 text-stone-600'}`}>{selected.status}</span></div>
-                      <div className="mt-1 font-semibold text-[17px] text-stone-900 truncate">{selected.restaurantName}</div>
-                      <div className="text-sm text-stone-600">{selected.foodType} · {selected.meals} meals · {kmAway(selected)} km away</div>
-                      <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
-                        <span className="bg-stone-50 border border-stone-200 px-2.5 py-1 rounded-full">{selected.pickupLocation}</span>
-                        <span className="bg-[#FFFBEB] border border-amber-200 text-amber-800 px-2.5 py-1 rounded-full">Pickup by {fmtUntil(selected.availableUntil)}</span>
-                      </div>
-                      {selected.description && <div className="mt-2 text-sm text-stone-600 bg-stone-50 border border-stone-200 rounded-xl p-3 leading-relaxed">{selected.description}</div>}
-                      <div className="mt-3">
-                        <StatusStepper status={selected.status} />
-                      </div>
+        {/* RIGHT — donation details on top, map below (never hidden behind map) */}
+        <div className="flex-1 p-3 sm:p-4 bg-[#FFFBEB] flex flex-col gap-3 lg:h-[calc(100vh-116px)] lg:overflow-auto">
+          <AnimatePresence mode="wait">
+            {selected ? (
+              <motion.div
+                key={selected.id}
+                initial={{ opacity: 0, y: -12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+                className="bg-white rounded-2xl border border-stone-200 shadow-sm p-4 sm:p-5"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 text-[11px] font-semibold tracking-widest text-stone-400">DONATION DETAILS <span className={`ml-1 px-2 py-0.5 rounded-full border text-[10px] ${selected.status==='AVAILABLE' ? 'bg-[#F0FDF4] border-green-200 text-leaf' : 'bg-stone-50 border-stone-200 text-stone-600'}`}>{selected.status}</span></div>
+                    <div className="mt-1 font-semibold text-[17px] text-stone-900 truncate">{selected.restaurantName}</div>
+                    <div className="text-sm text-stone-600">{selected.foodType} · {selected.meals} meals · {kmAway(selected)} km away</div>
+                    <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
+                      <span className="bg-stone-50 border border-stone-200 px-2.5 py-1 rounded-full">{selected.pickupLocation}</span>
+                      <span className="bg-[#FFFBEB] border border-amber-200 text-amber-800 px-2.5 py-1 rounded-full">Pickup by {fmtUntil(selected.availableUntil)}</span>
                     </div>
-                    <button onClick={()=>setSelectedId(null)} aria-label="Close details" className="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 grid place-items-center text-stone-600 shrink-0">×</button>
+                    {selected.description && <div className="mt-2 text-sm text-stone-600 bg-stone-50 border border-stone-200 rounded-xl p-3 leading-relaxed">{selected.description}</div>}
+                    <div className="mt-3">
+                      <StatusStepper status={selected.status} />
+                    </div>
                   </div>
-                  <div className="mt-4 flex gap-2">
-                    {selected.status === 'AVAILABLE' ? (
-                      <button onClick={()=>claim(selected)} disabled={claiming} className="flex-1 bg-leaf hover:bg-leaf-dark disabled:bg-stone-300 text-white font-semibold py-3 rounded-full transition-colors">Claim food</button>
-                    ) : (
-                      <div className="flex-1 bg-stone-50 border border-stone-200 text-stone-700 font-medium py-3 rounded-full text-center text-sm">Claimed by {selected.claimedByName || 'someone'} · {selected.status}</div>
-                    )}
-                    <a href={`https://www.google.com/maps/search/?api=1&query=${selected.lat},${selected.lng}`} target="_blank" rel="noreferrer" className="px-5 py-3 rounded-full border border-stone-200 bg-white font-medium text-sm hover:bg-stone-50 grid place-items-center">Directions</a>
-                  </div>
-                </motion.div>
-              ) : null}
-            </AnimatePresence>
+                  <button onClick={()=>setSelectedId(null)} aria-label="Close details" className="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 grid place-items-center text-stone-600 shrink-0">×</button>
+                </div>
+                <div className="mt-4 flex gap-2">
+                  {selected.status === 'AVAILABLE' ? (
+                    <button onClick={()=>claim(selected)} disabled={claiming} className="flex-1 bg-leaf hover:bg-leaf-dark disabled:bg-stone-300 text-white font-semibold py-3 rounded-full transition-colors">Claim food</button>
+                  ) : (
+                    <div className="flex-1 bg-stone-50 border border-stone-200 text-stone-700 font-medium py-3 rounded-full text-center text-sm">Claimed by {selected.claimedByName || 'someone'} · {selected.status}</div>
+                  )}
+                  <a href={`https://www.google.com/maps/search/?api=1&query=${selected.lat},${selected.lng}`} target="_blank" rel="noreferrer" className="px-5 py-3 rounded-full border border-stone-200 bg-white font-medium text-sm hover:bg-stone-50 grid place-items-center">Directions</a>
+                </div>
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
+
+          <div className="flex-1 min-h-[420px] rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-[#F7F5EF]">
+            <TeammateMap donations={available} onMarkerClick={setSelectedId} selectedId={selectedId} />
           </div>
 
           {!selected && (
