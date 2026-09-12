@@ -106,7 +106,7 @@ export function RestaurantDashboard() {
           ))}
         </div>
 
-        <div className="mt-6 grid lg:grid-cols-[1.35fr_0.75fr] gap-6">
+        <div className="mt-6">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-stone-900">Your donations</h2>
@@ -158,37 +158,6 @@ export function RestaurantDashboard() {
               </div>
             )}
           </motion.div>
-
-          <div className="space-y-4">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="bg-stone-900 rounded-2xl p-6 text-white">
-              <div className="text-[11px] font-semibold tracking-widest text-white/50">HOW STATUS WORKS</div>
-              <div className="mt-2 text-sm leading-relaxed text-white/80">When a kitchen claims your food, you’ll see <em className="text-white not-italic">Claimed</em>. Move it to Pickup then Delivered so both sides have a clear record.</div>
-              <div className="mt-4 bg-white/[0.08] rounded-xl p-3 border border-white/10">
-                <div className="text-sm font-medium">Tip</div>
-                <div className="text-xs opacity-60 leading-relaxed mt-1">Add listings via “Add Available Food” — they appear live on the beneficiary map via Supabase realtime.</div>
-              </div>
-            </motion.div>
-
-            <details className="group bg-white rounded-2xl border border-stone-200">
-              <summary className="list-none flex items-center justify-between p-5 cursor-pointer">
-                <h3 className="font-semibold text-stone-900 text-sm">Status guide</h3>
-                <span className="w-7 h-7 rounded-full bg-stone-100 grid place-items-center text-stone-500 group-open:rotate-180 transition-transform">⌄</span>
-              </summary>
-              <div className="px-5 pb-5 -mt-1 space-y-2.5 text-sm border-t border-stone-100 pt-4">
-                {[
-                  { k: 'AVAILABLE', d: 'Visible on the map for nearby kitchens' },
-                  { k: 'CLAIMED', d: 'A kitchen requested it — prepare for pickup' },
-                  { k: 'PICKUP', d: 'Kitchen is collecting' },
-                  { k: 'DELIVERED', d: 'Loop completed' },
-                ].map(s=> (
-                  <div key={s.k} className="flex gap-3">
-                    <span className="shrink-0 text-[11px] font-semibold tracking-widest bg-stone-900 text-white px-2 py-1 rounded-full h-fit">{s.k}</span>
-                    <span className="text-stone-600 leading-relaxed text-sm">{s.d}</span>
-                  </div>
-                ))}
-              </div>
-            </details>
-          </div>
         </div>
       </div>
     </div>
