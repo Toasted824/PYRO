@@ -95,6 +95,7 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
                 value={search}
                 onChange={e=>setSearch(e.target.value)}
                 placeholder="Search food, restaurant, area…"
+                aria-label="Search donations"
                 className="w-full rounded-full border border-stone-200 bg-stone-50 pl-8 pr-3 py-2 text-sm focus:outline-none focus:bg-white focus:border-stone-300 focus:ring-2 focus:ring-leaf/15 transition-all"
               />
             </div>

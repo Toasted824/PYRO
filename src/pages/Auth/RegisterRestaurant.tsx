@@ -57,6 +57,14 @@ export function RegisterRestaurant() {
             <Field label="Contact information" value={form.contact} onChange={v => setForm({ ...form, contact: v })} placeholder="+977 98XXXXXXXX" />
             <Field label="Email" value={form.email} onChange={v => setForm({ ...form, email: v })} placeholder="hello@kathmandukitchen.com" type="email" />
             <Field label="Password" value={form.password} onChange={v => setForm({ ...form, password: v })} placeholder="At least 6 characters" type="password" />
+            {form.password.length > 0 && (
+              <div className="flex items-center gap-2 mt-1">
+                <div className="flex-1 h-1.5 rounded-full bg-stone-100 overflow-hidden">
+                  <div className={`h-full rounded-full transition-all ${form.password.length >= 12 ? 'bg-[#16A34A] w-full' : form.password.length >= 8 ? 'bg-amber-400 w-2/3' : form.password.length >= 6 ? 'bg-amber-300 w-1/3' : 'bg-red-400 w-[15%]'}`} />
+                </div>
+                <span className="text-[11px] font-medium text-stone-500">{form.password.length >= 12 ? 'Strong' : form.password.length >= 8 ? 'Good' : form.password.length >= 6 ? 'OK' : 'Weak'}</span>
+              </div>
+            )}
             {err && <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2 rounded-xl">{err}</div>}
             {info && <div className="bg-[#F0FDF4] border border-green-200 text-[#15803D] text-sm px-3 py-2 rounded-xl">{info}</div>}
             <button type="submit" disabled={submitting} className="w-full bg-[#16A34A] hover:bg-[#15803D] disabled:bg-stone-300 disabled:cursor-not-allowed text-white font-extrabold py-3.5 rounded-full shadow transition">{submitting ? 'Creating account…' : 'Create restaurant account →'}</button>
@@ -70,10 +78,19 @@ export function RegisterRestaurant() {
 
 function Field({ label, value, onChange, placeholder, type = 'text' }: { label: string; value: string; onChange: (v: string) => void; placeholder: string; type?: string }) {
   const id = `field-${label.toLowerCase().replace(/\s+/g, '-')}`
+  const isPassword = type === 'password'
+  const [show, setShow] = useState(false)
   return (
     <div>
       <label htmlFor={id} className="text-xs font-bold tracking-widest text-stone-500">{label.toUpperCase()}</label>
-      <input id={id} type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="mt-1 w-full rounded-xl border border-stone-200 bg-[#FFFBEB]/30 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20 focus:border-[#16A34A]" />
+      <div className="relative">
+        <input id={id} type={isPassword && show ? 'text' : type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="mt-1 w-full rounded-xl border border-stone-200 bg-[#FFFBEB]/30 px-4 py-3 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20 focus:border-[#16A34A]" />
+        {isPassword && (
+          <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-stone-500 hover:text-stone-700 mt-0.5" aria-label={show ? 'Hide password' : 'Show password'}>
+            {show ? 'Hide' : 'Show'}
+          </button>
+        )}
+      </div>
     </div>
   )
 }

@@ -62,9 +62,11 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Suspense fallback={<Fallback />}>
+      <Suspense fallback={<Fallback />}>
+        <main id="main-content">
           <AnimatedRoutes />
-        </Suspense>
+        </main>
+      </Suspense>
         <ToastHost />
       </BrowserRouter>
     </AuthProvider>

@@ -142,13 +142,13 @@ export function RestaurantDashboard() {
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         {d.status==='AVAILABLE' && (
-                          <button onClick={()=>{setConfirmingId(null); advance(d)}} className="text-xs font-semibold px-3.5 py-2 rounded-full border transition-colors bg-stone-900 text-white hover:bg-black border-stone-900">Mark claimed</button>
+                          <button aria-label={`Mark ${d.foodType} as claimed`} onClick={()=>{setConfirmingId(null); advance(d)}} className="text-xs font-semibold px-3.5 py-2 rounded-full border transition-colors bg-stone-900 text-white hover:bg-black border-stone-900">Mark claimed</button>
                         )}
                         {d.status!=='AVAILABLE' && (
-                          <button onClick={()=>advance(d)} disabled={d.status==='PICKED_UP'} className={`text-xs font-semibold px-4 py-2 rounded-full border transition-colors ${d.status==='PICKED_UP'?'bg-stone-50 text-stone-400 border-stone-200 cursor-not-allowed':'bg-stone-900 text-white hover:bg-black border-stone-900'}`}>{d.status==='CLAIMED'?'Mark picked up':'Completed'}</button>
+                          <button aria-label={d.status==='CLAIMED'?`Mark ${d.foodType} as picked up`:'Completed'} onClick={()=>advance(d)} disabled={d.status==='PICKED_UP'} className={`text-xs font-semibold px-4 py-2 rounded-full border transition-colors ${d.status==='PICKED_UP'?'bg-stone-50 text-stone-400 border-stone-200 cursor-not-allowed':'bg-stone-900 text-white hover:bg-black border-stone-900'}`}>{d.status==='CLAIMED'?'Mark picked up':'Completed'}</button>
                         )}
                         {d.status==='AVAILABLE' && (
-                          <button onClick={()=>remove(d)} className={`text-xs font-semibold px-3.5 py-2 rounded-full border transition-colors ${confirmingId===d.id?'bg-red-600 text-white border-red-600':'bg-white text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300'}`}>{confirmingId===d.id?'Confirm?':'Delete'}</button>
+                          <button aria-label={`Delete ${d.foodType} listing`} onClick={()=>remove(d)} className={`text-xs font-semibold px-3.5 py-2 rounded-full border transition-colors ${confirmingId===d.id?'bg-red-600 text-white border-red-600':'bg-white text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300'}`}>{confirmingId===d.id?'Confirm?':'Delete'}</button>
                         )}
                       </div>
                     </div>

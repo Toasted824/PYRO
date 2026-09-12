@@ -11,6 +11,7 @@ export function Login() {
   const [role, setRole] = useState<Role>(initial === 'beneficiary' ? 'beneficiary' : 'restaurant')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [err, setErr] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const { user, initializing, login } = useAuth()
@@ -51,12 +52,12 @@ export function Login() {
           </div>
 
           <div className="mt-5 grid grid-cols-2 gap-3">
-            <button onClick={() => setRole('restaurant')} className={`rounded-2xl border-2 p-4 flex flex-col items-center gap-1 transition ${role === 'restaurant' ? 'border-[#16A34A] bg-[#F0FDF4]' : 'border-stone-200 bg-white hover:border-stone-300'}`}>
+            <button aria-pressed={role === 'restaurant'} onClick={() => setRole('restaurant')} className={`rounded-2xl border-2 p-4 flex flex-col items-center gap-1 transition ${role === 'restaurant' ? 'border-[#16A34A] bg-[#F0FDF4]' : 'border-stone-200 bg-white hover:border-stone-300'}`}>
               <span className="text-2xl">🍽️</span>
               <span className={`text-sm font-extrabold ${role === 'restaurant' ? 'text-[#16A34A]' : 'text-stone-700'}`}>Restaurant</span>
               {role === 'restaurant' && <span className="text-[11px] bg-[#16A34A] text-white px-2 py-0.5 rounded-full font-bold">Selected</span>}
             </button>
-            <button onClick={() => setRole('beneficiary')} className={`rounded-2xl border-2 p-4 flex flex-col items-center gap-1 transition ${role === 'beneficiary' ? 'border-sky-500 bg-sky-50' : 'border-stone-200 bg-white hover:border-stone-300'}`}>
+            <button aria-pressed={role === 'beneficiary'} onClick={() => setRole('beneficiary')} className={`rounded-2xl border-2 p-4 flex flex-col items-center gap-1 transition ${role === 'beneficiary' ? 'border-sky-500 bg-sky-50' : 'border-stone-200 bg-white hover:border-stone-300'}`}>
               <span className="text-2xl">🤝</span>
               <span className={`text-sm font-extrabold ${role === 'beneficiary' ? 'text-sky-600' : 'text-stone-700'}`}>Beneficiary</span>
               {role === 'beneficiary' && <span className="text-[11px] bg-sky-500 text-white px-2 py-0.5 rounded-full font-bold">Selected</span>}
@@ -70,7 +71,12 @@ export function Login() {
             </div>
             <div>
               <label htmlFor="login-password" className="text-xs font-bold tracking-widest text-stone-500">PASSWORD</label>
-              <input id="login-password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" className="mt-1 w-full rounded-xl border border-stone-200 bg-[#FFFBEB]/50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20 focus:border-[#16A34A]" />
+              <div className="relative">
+                <input id="login-password" type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" className="mt-1 w-full rounded-xl border border-stone-200 bg-[#FFFBEB]/50 px-4 py-3 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20 focus:border-[#16A34A]" />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-stone-500 hover:text-stone-700 mt-0.5" aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
             </div>
             {err && <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2 rounded-xl">{err}</div>}
             <button type="submit" disabled={submitting} className="w-full bg-stone-900 hover:bg-black disabled:bg-stone-400 text-white font-extrabold py-3.5 rounded-full shadow transition">{submitting ? 'Logging in…' : 'Login →'}</button>
