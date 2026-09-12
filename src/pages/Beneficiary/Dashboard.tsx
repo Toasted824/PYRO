@@ -113,7 +113,7 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
         </div>
       </div>
 
-      <div className="flex-1 max-w-[1440px] mx-auto w-full flex flex-col lg:flex-row min-h-[calc(100vh-116px)]">
+      <div className="flex-1 max-w-[1440px] mx-auto w-full flex flex-col lg:flex-row min-h-0 lg:min-h-[calc(100vh-116px)]">
         {/* LEFT — list */}
         <div className="w-full lg:w-[380px] xl:w-[400px] border-r border-stone-200 bg-white flex flex-col lg:h-[calc(100vh-116px)] lg:overflow-hidden">
           <div className="p-3 border-b border-stone-200 bg-[#FFFBEB]/40 flex items-center justify-between">
@@ -187,7 +187,7 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
         </div>
 
         {/* RIGHT — donation details on top, map below (never hidden behind map) */}
-        <div className="flex-1 p-3 sm:p-4 bg-[#FFFBEB] flex flex-col gap-3 lg:h-[calc(100vh-116px)] lg:overflow-auto">
+        <div className="flex-1 min-h-0 p-3 sm:p-4 bg-[#FFFBEB] flex flex-col gap-3 lg:h-[calc(100vh-116px)] lg:overflow-auto">
           <AnimatePresence mode="wait">
             {selected ? (
               <motion.div
@@ -226,7 +226,7 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
             ) : null}
           </AnimatePresence>
 
-          <div className="flex-1 min-h-[420px] rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-[#F7F5EF]">
+          <div className="h-[360px] sm:h-[420px] lg:h-auto lg:flex-1 min-h-[360px] lg:min-h-[420px] rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-[#F7F5EF]">
             <TeammateMap donations={available} onMarkerClick={setSelectedId} selectedId={selectedId} />
           </div>
 
