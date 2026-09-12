@@ -87,12 +87,13 @@ export function TeammateMap({
         center={center}
         zoom={12}
         style={{ height: '100%', width: '100%', background: '#F7F5EF' }}
-        scrollWheelZoom={false}
+        scrollWheelZoom
         doubleClickZoom
         zoomControl
         maxBounds={[[26.3, 82.5], [30.5, 88]]}
         maxBoundsViscosity={0.8}
-        wheelDebounceTime={80}
+        wheelDebounceTime={40}
+        wheelPxPerZoomLevel={80}
       >
         {/* Carto Light — muted, low noise */}
         <TileLayer

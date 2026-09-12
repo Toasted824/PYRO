@@ -217,7 +217,7 @@ export function LocationPicker({
           <span className="font-semibold text-leaf">Pin set:</span> {value.label} <span className="text-stone-400">· {value.lat!.toFixed(5)}, {value.lng!.toFixed(5)}</span>
         </div>
       ) : (
-        <div className="text-xs text-stone-500">Tap the map or pick a search result — you can also use your current location.</div>
+        <div className="text-xs text-stone-500">Scroll to zoom, click or drag pin to set location — you can also use your current location.</div>
       )}
 
       <div className="h-[220px] rounded-2xl overflow-hidden border border-stone-200 shadow-sm">
@@ -225,7 +225,9 @@ export function LocationPicker({
           center={hasPin ? [value.lat!, value.lng!] : [CENTER.lat, CENTER.lng]}
           zoom={hasPin ? 15 : 12}
           style={{ height: '100%', width: '100%', background: '#F7F5EF' }}
-          scrollWheelZoom={false}
+          scrollWheelZoom
+          wheelDebounceTime={40}
+          wheelPxPerZoomLevel={80}
           doubleClickZoom
           zoomControl
         >
