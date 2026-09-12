@@ -1,11 +1,10 @@
 import type { DonationStatus } from '../../lib/types'
 
-const STEPS: DonationStatus[] = ['AVAILABLE', 'CLAIMED', 'PICKUP', 'DELIVERED']
+const STEPS: DonationStatus[] = ['AVAILABLE', 'CLAIMED', 'PICKED_UP']
 const LABELS: Record<DonationStatus, string> = {
   AVAILABLE: 'Available',
   CLAIMED: 'Claimed',
-  PICKUP: 'Pickup',
-  DELIVERED: 'Delivered',
+  PICKED_UP: 'Picked up',
 }
 
 export function StatusStepper({ status, compact }: { status: DonationStatus; compact?: boolean }) {

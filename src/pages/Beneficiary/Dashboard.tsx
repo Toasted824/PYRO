@@ -159,8 +159,8 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
                       className={`group rounded-2xl border p-4 cursor-pointer text-left transition-all duration-200 ${selectedId===d.id ? 'bg-white border-leaf shadow-[0_8px_20px_rgba(22,163,74,0.10)] ring-1 ring-leaf/20' : 'bg-white border-stone-200 hover:border-stone-300 hover:shadow-sm hover:-translate-y-[1px]'}`}
                     >
                       <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full shrink-0 ${d.status==='AVAILABLE' ? 'bg-leaf' : d.status==='CLAIMED' ? 'bg-amber-500' : 'bg-sky-500'}`} aria-hidden="true" />
-                        <span className="text-[11px] font-semibold tracking-widest text-stone-500">{d.status}</span>
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${d.status==='AVAILABLE' ? 'bg-leaf' : d.status==='CLAIMED' ? 'bg-amber-500' : 'bg-leaf'}`} aria-hidden="true" />
+                        <span className="text-[11px] font-semibold tracking-widest text-stone-500">{d.status.replace('_',' ')}</span>
                         {tab==='available' && <span className="ml-auto text-xs text-stone-400">{kmAway(d)} km away</span>}
                       </div>
                       <div className="mt-2 font-semibold text-stone-900 leading-tight">{d.restaurantName} <span className="font-normal text-stone-500">· {d.foodType}</span></div>
@@ -200,7 +200,7 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
               >
                 <div className="flex items-start gap-4">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 text-[11px] font-semibold tracking-widest text-stone-400">DONATION DETAILS <span className={`ml-1 px-2 py-0.5 rounded-full border text-[10px] ${selected.status==='AVAILABLE' ? 'bg-[#F0FDF4] border-green-200 text-leaf' : 'bg-stone-50 border-stone-200 text-stone-600'}`}>{selected.status}</span></div>
+                    <div className="flex items-center gap-2 text-[11px] font-semibold tracking-widest text-stone-400">DONATION DETAILS <span className={`ml-1 px-2 py-0.5 rounded-full border text-[10px] ${selected.status==='AVAILABLE' ? 'bg-[#F0FDF4] border-green-200 text-leaf' : selected.status==='CLAIMED' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-[#F0FDF4] border-green-200 text-leaf'}`}>{selected.status.replace('_',' ')}</span></div>
                     <div className="mt-1 font-semibold text-[17px] text-stone-900 truncate">{selected.restaurantName}</div>
                     <div className="text-sm text-stone-600">{selected.foodType} · {selected.meals} meals · {kmAway(selected)} km away</div>
                     <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
@@ -218,7 +218,7 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
                   {selected.status === 'AVAILABLE' ? (
                     <button onClick={()=>claim(selected)} disabled={claiming} className="flex-1 bg-leaf hover:bg-leaf-dark disabled:bg-stone-300 text-white font-semibold py-3 rounded-full transition-colors">Claim food</button>
                   ) : (
-                    <div className="flex-1 bg-stone-50 border border-stone-200 text-stone-700 font-medium py-3 rounded-full text-center text-sm">Claimed by {selected.claimedByName || 'someone'} · {selected.status}</div>
+                    <div className="flex-1 bg-stone-50 border border-stone-200 text-stone-700 font-medium py-3 rounded-full text-center text-sm">Claimed by {selected.claimedByName || 'someone'} · {selected.status.replace('_',' ')}</div>
                   )}
                   <a href={`https://www.google.com/maps/search/?api=1&query=${selected.lat},${selected.lng}`} target="_blank" rel="noreferrer" className="px-5 py-3 rounded-full border border-stone-200 bg-white font-medium text-sm hover:bg-stone-50 grid place-items-center">Directions</a>
                 </div>

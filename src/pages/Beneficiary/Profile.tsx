@@ -40,12 +40,11 @@ export function BeneficiaryProfile() {
   const stats = useMemo(() => {
     const total = myClaimed.length
     const mealsRescued = myClaimed.reduce((a, b) => a + b.meals, 0)
-    const delivered = myClaimed.filter(d => d.status === 'DELIVERED').length
-    const pickup = myClaimed.filter(d => d.status === 'PICKUP').length
+    const pickedUp = myClaimed.filter(d => d.status === 'PICKED_UP').length
     const claimed = myClaimed.filter(d => d.status === 'CLAIMED').length
-    const mealsDelivered = myClaimed.filter(d => d.status === 'DELIVERED').reduce((a, b) => a + b.meals, 0)
+    const mealsPickedUp = myClaimed.filter(d => d.status === 'PICKED_UP').reduce((a, b) => a + b.meals, 0)
     const restaurantsSupported = new Set(myClaimed.map(d => d.restaurantId)).size
-    return { total, mealsRescued, delivered, pickup, claimed, mealsDelivered, restaurantsSupported }
+    return { total, mealsRescued, pickedUp, claimed, mealsPickedUp, restaurantsSupported }
   }, [myClaimed])
 
   const selected = donations.find(d => d.id === selectedId) || null
@@ -97,7 +96,7 @@ export function BeneficiaryProfile() {
           {[
             { label: 'Total claims', value: stats.total, hint: 'meals you claimed' },
             { label: 'Meals rescued', value: stats.mealsRescued, hint: 'all statuses' },
-            { label: 'Delivered', value: stats.delivered, hint: `${stats.mealsDelivered} meals completed` },
+            { label: 'Picked up', value: stats.pickedUp, hint: `${stats.mealsPickedUp} meals completed` },
             { label: 'Restaurants supported', value: stats.restaurantsSupported, hint: 'unique donors' },
           ].map((s, i) => (
             <motion.div key={s.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.05, duration: 0.4 }} className="bg-white rounded-2xl border border-stone-200 p-4 pt-3.5 relative overflow-hidden hover:shadow-sm hover:-translate-y-[1px] transition-all">
@@ -109,10 +108,10 @@ export function BeneficiaryProfile() {
           ))}
         </div>
 
-        <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
-          <div className="bg-white rounded-xl border border-stone-200 p-3 text-center"><div className="font-bold text-stone-900">{stats.claimed}</div><div className="text-stone-500">Claimed</div></div>
-          <div className="bg-white rounded-xl border border-stone-200 p-3 text-center"><div className="font-bold text-sky-700">{stats.pickup}</div><div className="text-stone-500">Pickup</div></div>
-          <div className="bg-[#F0FDF4] rounded-xl border border-green-200 p-3 text-center"><div className="font-bold text-leaf">{stats.delivered}</div><div className="text-stone-500">Delivered</div></div>
+        <div className="mt-3 grid grid-cols-3 gap-3 text-xs">
+          <div className="bg-white rounded-xl border border-stone-200 p-4 text-center flex flex-col items-center justify-center min-h-[72px]"><div className="font-bold text-stone-900 text-[16px] leading-none">{stats.claimed}</div><div className="text-stone-500 mt-1">Claimed</div></div>
+          <div className="bg-[#F0FDF4] rounded-xl border border-green-200 p-4 text-center flex flex-col items-center justify-center min-h-[72px]"><div className="font-bold text-leaf text-[16px] leading-none">{stats.pickedUp}</div><div className="text-stone-500 mt-1">Picked up</div></div>
+          <div className="bg-white rounded-xl border border-stone-200 p-4 text-center flex flex-col items-center justify-center min-h-[72px]"><div className="font-bold text-stone-900 text-[16px] leading-none">{stats.total}</div><div className="text-stone-500 mt-1">Total</div></div>
         </div>
 
         {/* History + Map */}
@@ -143,8 +142,8 @@ export function BeneficiaryProfile() {
                         className={`rounded-2xl border p-4 cursor-pointer transition-all ${selectedId === d.id ? 'bg-white border-leaf shadow ring-1 ring-leaf/20' : 'bg-white border-stone-200 hover:border-stone-300 hover:shadow-sm'}`}
                       >
                         <div className="flex items-center gap-2">
-                          <span className={`w-2 h-2 rounded-full ${d.status === 'CLAIMED' ? 'bg-amber-500' : d.status === 'PICKUP' ? 'bg-sky-500' : d.status === 'DELIVERED' ? 'bg-leaf' : 'bg-stone-400'}`} />
-                          <span className="text-[11px] font-semibold tracking-widest text-stone-500">{d.status}</span>
+                          <span className={`w-2 h-2 rounded-full ${d.status === 'CLAIMED' ? 'bg-amber-500' : 'bg-leaf'}`} />
+                          <span className="text-[11px] font-semibold tracking-widest text-stone-500">{d.status.replace('_',' ')}</span>
                           <span className="ml-auto text-xs text-stone-400">{kmAway(d)} km away · {fmtDate(d.createdAt)}</span>
                         </div>
                         <div className="mt-1.5 font-semibold text-stone-900">{d.restaurantName} <span className="font-normal text-stone-500">· {d.foodType}</span></div>

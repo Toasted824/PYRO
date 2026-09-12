@@ -41,7 +41,7 @@ export function Landing() {
     if (user.role === 'restaurant') {
       return (
         <div className="min-h-screen bg-[#FFFBEB] flex flex-col">
-          <SEO title={`Welcome back, ${user.name} — FoodLoop Restaurant Home`} description="Your restaurant home on FoodLoop — post surplus food, track donations from Available to Delivered, and coordinate pickup with nearby kitchens." canonicalPath="/" />
+          <SEO title={`Welcome back, ${user.name} — FoodLoop Restaurant Home`} description="Your restaurant home on FoodLoop — post surplus food, track donations from Available to Picked up, and coordinate pickup with nearby kitchens." canonicalPath="/" />
           <Header transparent />
           <main className="flex-1">
             <section className="relative geometric-grid overflow-hidden">
@@ -72,7 +72,7 @@ export function Landing() {
               <Link to="/restaurant/dashboard" className="group bg-white rounded-2xl border border-stone-200 p-5 hover:border-stone-300 hover:shadow-sm hover:-translate-y-[1px] transition-all">
                 <div className="text-xs font-semibold tracking-widest text-leaf">DASHBOARD</div>
                 <div className="mt-1 font-semibold text-stone-900">Track your donations</div>
-                <div className="text-sm text-stone-600 leading-relaxed">Available → Claimed → Pickup → Delivered</div>
+                <div className="text-sm text-stone-600 leading-relaxed">Available → Claimed → Picked up</div>
                 <div className="mt-3 text-sm font-medium text-stone-900 group-hover:gap-1.5 inline-flex items-center gap-1">Open dashboard <span>→</span></div>
               </Link>
               <Link to="/restaurant/new" className="group bg-leaf text-white rounded-2xl p-5 hover:bg-leaf-dark transition-colors">

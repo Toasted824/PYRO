@@ -14,7 +14,7 @@ export function HowItWorks() {
     step: [
       { '@type': 'HowToStep', name: 'Restaurant posts surplus', text: 'Add food type, meals, pickup window, and location. Listing appears immediately on the map.' },
       { '@type': 'HowToStep', name: 'Kitchen finds it nearby', text: 'Verified beneficiaries browse by distance and food type, then request pickup.' },
-      { '@type': 'HowToStep', name: 'Pickup and confirmation', text: 'Restaurant confirms, kitchen collects, both sides mark delivered.' },
+      { '@type': 'HowToStep', name: 'Pickup and confirmation', text: 'Restaurant confirms, kitchen collects, both sides mark picked up.' },
     ],
   }
 
@@ -45,7 +45,7 @@ export function HowItWorks() {
           {[
             { k: '01', t: 'Restaurant posts surplus', d: 'Add food type, number of meals, pickup window, and exact location. The listing appears immediately on the map.' },
             { k: '02', t: 'Kitchen finds it nearby', d: 'Verified beneficiaries browse by distance and food type, then tap to request a pickup.' },
-            { k: '03', t: 'Pickup and confirmation', d: 'The restaurant confirms, the kitchen collects, and both sides mark the donation as delivered.' },
+            { k: '03', t: 'Pickup and confirmation', d: 'The restaurant confirms, the kitchen collects, and both sides mark the donation as picked up.' },
           ].map((s, i) => (
             <motion.div key={s.k} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.08*i, duration: 0.45 }} className="rounded-2xl border border-stone-200 p-6 bg-white hover:shadow-sm hover:-translate-y-[1px] transition-all">
               <div className="text-xs font-semibold tracking-widest text-leaf">{s.k}</div>
@@ -60,7 +60,7 @@ export function HowItWorks() {
           <ol className="mt-3 space-y-2 text-sm text-stone-600 list-decimal list-inside leading-relaxed">
             <li>Listing is visible to verified beneficiaries within Kathmandu Valley.</li>
             <li>When a kitchen claims it, the restaurant receives the kitchen name and contact.</li>
-            <li>Status moves from Available to Claimed to Picked up to Delivered, so both sides can track it.</li>
+            <li>Status moves from Available to Claimed to Picked up, so both sides can track it.</li>
           </ol>
           <p className="mt-3 text-sm text-stone-500">No automated delivery. Both parties coordinate timing and handling directly. <Link to="/explore" className="underline underline-offset-4 font-medium text-stone-700">Browse live listings</Link>.</p>
         </div>

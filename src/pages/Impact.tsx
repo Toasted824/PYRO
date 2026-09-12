@@ -28,7 +28,7 @@ export function Impact() {
             <ul className="mt-3 space-y-2 text-sm text-stone-600 list-disc list-inside leading-relaxed">
               <li>Restaurant posting with meals, pickup window, and map location</li>
               <li>Beneficiary map sorted by distance, with claim flow</li>
-              <li>Account verification step and status tracking from Available to Delivered</li>
+              <li>Account verification step and status tracking from Available to Picked up</li>
             </ul>
           </div>
           <div className="bg-white rounded-xl border border-stone-200 p-6">
@@ -44,7 +44,7 @@ export function Impact() {
         <div className="mt-6 bg-white rounded-xl border border-stone-200 p-6">
           <h2 className="font-semibold text-stone-900">How we will measure impact later</h2>
           <p className="mt-2 text-sm text-stone-600 leading-relaxed">
-            When real donations are completed, we will count delivered meals, active restaurants, and receiving organizations based on actual records in the system. We will show methodology alongside numbers, and keep the data local to Kathmandu Valley until we have a reliable process elsewhere.
+            When real donations are completed, we will count picked-up meals, active restaurants, and receiving organizations based on actual records in the system. We will show methodology alongside numbers, and keep the data local to Kathmandu Valley until we have a reliable process elsewhere.
           </p>
           <p className="mt-2 text-sm text-stone-500">No estimates are shown here. We prefer to report nothing than to show figures that are not real. <Link to="/explore" className="underline underline-offset-4 font-medium text-stone-700">See current listings</Link>.</p>
         </div>

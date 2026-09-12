@@ -1,5 +1,5 @@
 export type Role = 'restaurant' | 'beneficiary'
-export type DonationStatus = 'AVAILABLE' | 'CLAIMED' | 'PICKUP' | 'DELIVERED'
+export type DonationStatus = 'AVAILABLE' | 'CLAIMED' | 'PICKED_UP'
 
 export interface User {
   id: string

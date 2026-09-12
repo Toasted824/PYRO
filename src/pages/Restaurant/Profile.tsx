@@ -36,11 +36,10 @@ export function RestaurantProfile() {
     const total = myDonations.length
     const active = myDonations.filter(d => d.status === 'AVAILABLE').length
     const claimed = myDonations.filter(d => d.status === 'CLAIMED').length
-    const pickup = myDonations.filter(d => d.status === 'PICKUP').length
-    const delivered = myDonations.filter(d => d.status === 'DELIVERED').length
+    const pickedUp = myDonations.filter(d => d.status === 'PICKED_UP').length
     const mealsListed = myDonations.reduce((a, b) => a + b.meals, 0)
-    const mealsShared = myDonations.filter(d => ['CLAIMED', 'PICKUP', 'DELIVERED'].includes(d.status)).reduce((a, b) => a + b.meals, 0)
-    return { total, active, claimed, pickup, delivered, mealsListed, mealsShared }
+    const mealsShared = myDonations.filter(d => ['CLAIMED', 'PICKED_UP'].includes(d.status)).reduce((a, b) => a + b.meals, 0)
+    return { total, active, claimed, pickedUp, mealsListed, mealsShared }
   }, [myDonations])
 
   const selected = myDonations.find(d => d.id === selectedId) || null
@@ -91,7 +90,7 @@ export function RestaurantProfile() {
             { label: 'Total donations', value: stats.total, hint: 'all time' },
             { label: 'Active', value: stats.active, hint: 'on map now' },
             { label: 'Meals listed', value: stats.mealsListed, hint: 'all donations' },
-            { label: 'Meals shared', value: stats.mealsShared, hint: 'claimed+pickup+delivered' },
+            { label: 'Meals shared', value: stats.mealsShared, hint: 'claimed + picked up' },
           ].map((s, i) => (
             <motion.div key={s.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.05, duration: 0.4 }} className="bg-white rounded-2xl border border-stone-200 p-4 pt-3.5 relative overflow-hidden hover:shadow-sm hover:-translate-y-[1px] transition-all">
               <div className="absolute top-0 left-0 right-0 h-[3px] bg-leaf" aria-hidden="true" />
@@ -102,11 +101,10 @@ export function RestaurantProfile() {
           ))}
         </div>
 
-        <div className="mt-2 grid grid-cols-4 gap-2 text-xs">
-          <div className="bg-white rounded-xl border border-stone-200 p-3 text-center"><div className="font-bold text-leaf">{stats.active}</div><div className="text-stone-500">Available</div></div>
-          <div className="bg-amber-50 rounded-xl border border-amber-200 p-3 text-center"><div className="font-bold text-amber-700">{stats.claimed}</div><div className="text-stone-500">Claimed</div></div>
-          <div className="bg-sky-50 rounded-xl border border-sky-200 p-3 text-center"><div className="font-bold text-sky-700">{stats.pickup}</div><div className="text-stone-500">Pickup</div></div>
-          <div className="bg-[#F0FDF4] rounded-xl border border-green-200 p-3 text-center"><div className="font-bold text-leaf">{stats.delivered}</div><div className="text-stone-500">Delivered</div></div>
+        <div className="mt-3 grid grid-cols-3 gap-3 text-xs">
+          <div className="bg-white rounded-xl border border-stone-200 p-4 text-center flex flex-col items-center justify-center min-h-[72px]"><div className="font-bold text-leaf text-[16px] leading-none">{stats.active}</div><div className="text-stone-500 mt-1">Available</div></div>
+          <div className="bg-amber-50 rounded-xl border border-amber-200 p-4 text-center flex flex-col items-center justify-center min-h-[72px]"><div className="font-bold text-amber-700 text-[16px] leading-none">{stats.claimed}</div><div className="text-stone-500 mt-1">Claimed</div></div>
+          <div className="bg-[#F0FDF4] rounded-xl border border-green-200 p-4 text-center flex flex-col items-center justify-center min-h-[72px]"><div className="font-bold text-leaf text-[16px] leading-none">{stats.pickedUp}</div><div className="text-stone-500 mt-1">Picked up</div></div>
         </div>
 
         <div className="mt-6 grid lg:grid-cols-[1.15fr_0.85fr] gap-6">
@@ -131,8 +129,8 @@ export function RestaurantProfile() {
                     {myDonations.map(d => (
                       <motion.div key={d.id} layout onClick={() => setSelectedId(d.id)} className={`rounded-2xl border p-4 cursor-pointer transition-all ${selectedId === d.id ? 'bg-white border-leaf shadow ring-1 ring-leaf/20' : 'bg-white border-stone-200 hover:border-stone-300 hover:shadow-sm'}`}>
                         <div className="flex items-center gap-2">
-                          <span className={`w-2 h-2 rounded-full ${d.status === 'AVAILABLE' ? 'bg-leaf' : d.status === 'CLAIMED' ? 'bg-amber-500' : d.status === 'PICKUP' ? 'bg-sky-500' : 'bg-stone-400'}`} />
-                          <span className="text-[11px] font-semibold tracking-widest text-stone-500">{d.status}</span>
+                          <span className={`w-2 h-2 rounded-full ${d.status === 'AVAILABLE' ? 'bg-leaf' : d.status === 'CLAIMED' ? 'bg-amber-500' : 'bg-leaf'}`} />
+                          <span className="text-[11px] font-semibold tracking-widest text-stone-500">{d.status.replace('_',' ')}</span>
                           <span className="ml-auto text-xs text-stone-400">{fmtDate(d.createdAt)} · {d.meals} meals</span>
                         </div>
                         <div className="mt-1.5 font-semibold text-stone-900">{d.foodType} · {d.meals} meals</div>

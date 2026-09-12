@@ -23,7 +23,7 @@ const iconCache = new Map<string, L.DivIcon>()
 function iconFor(status: Donation['status']) {
   const cached = iconCache.get(status)
   if (cached) return cached
-  const color = status === 'AVAILABLE' ? '#16A34A' : status === 'CLAIMED' ? '#F97316' : status === 'PICKUP' ? '#0EA5E9' : '#6B7280'
+  const color = status === 'AVAILABLE' ? '#16A34A' : status === 'CLAIMED' ? '#F97316' : '#16A34A'
   const glyph = status === 'AVAILABLE' ? '●' : '✓'
   const html = `<div style="width:28px;height:28px;background:${color};border:3px solid white;border-radius:50%;box-shadow:0 4px 10px rgba(0,0,0,0.18);display:grid;place-items:center;color:white;font-size:13px">${glyph}</div>`
   const icon = L.divIcon({ html, className: '', iconSize: [28, 28], iconAnchor: [14, 14] })

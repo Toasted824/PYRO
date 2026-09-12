@@ -36,16 +36,16 @@ export function RestaurantDashboard() {
   )
 
   const mealsShared = myDonations
-    .filter(d => d.status === 'DELIVERED' || d.status === 'PICKUP' || d.status === 'CLAIMED')
+    .filter(d => d.status === 'CLAIMED' || d.status === 'PICKED_UP')
     .reduce((a, b) => a + b.meals, 0)
 
   const advance = async (d: Donation) => {
-    const order: Donation['status'][] = ['AVAILABLE', 'CLAIMED', 'PICKUP', 'DELIVERED']
+    const order: Donation['status'][] = ['AVAILABLE', 'CLAIMED', 'PICKED_UP']
     const idx = order.indexOf(d.status)
     if (idx >= order.length - 1) return
     try {
       await updateDonationStatus(d.id, order[idx + 1])
-      pushToast(`Moved to ${order[idx + 1]}`)
+      pushToast(`Moved to ${order[idx + 1].replace('_', ' ')}`)
       reload()
     } catch (e: unknown) {
       pushToast(e instanceof Error ? e.message : 'Update failed', 'info')
@@ -95,7 +95,7 @@ export function RestaurantDashboard() {
           {[
             { label: 'Active', value: myDonations.filter(d=>d.status==='AVAILABLE').length, hint: 'on map now' },
             { label: 'Claimed', value: myDonations.filter(d=>d.status==='CLAIMED').length, hint: 'awaiting pickup' },
-            { label: 'Meals shared', value: mealsShared, hint: 'claimed/pickup/delivered' },
+            { label: 'Meals shared', value: mealsShared, hint: 'claimed / picked up' },
           ].map((s, i)=> (
             <motion.div key={s.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06*i, duration: 0.4 }} className="bg-white rounded-2xl border border-stone-200 p-4 pt-3.5 relative overflow-hidden hover:shadow-sm hover:-translate-y-[1px] transition-all">
               <div className="absolute top-0 left-0 right-0 h-[3px] bg-leaf" aria-hidden="true" />
@@ -128,7 +128,7 @@ export function RestaurantDashboard() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className={`text-[11px] font-semibold tracking-widest px-2.5 py-1 rounded-full border ${d.status==='AVAILABLE'?'bg-[#F0FDF4] border-green-200 text-leaf': d.status==='CLAIMED'?'bg-amber-50 border-amber-200 text-amber-700':'bg-sky-50 border-sky-200 text-sky-700'}`}>{d.status}</span>
+                          <span className={`text-[11px] font-semibold tracking-widest px-2.5 py-1 rounded-full border ${d.status==='AVAILABLE'?'bg-[#F0FDF4] border-green-200 text-leaf': d.status==='CLAIMED'?'bg-amber-50 border-amber-200 text-amber-700':'bg-[#F0FDF4] border-green-200 text-leaf'}`}>{d.status.replace('_',' ')}</span>
                           <span className="text-xs text-stone-500">{timeLeft(d.availableUntil)} · {d.meals} meals</span>
                         </div>
                         <div className="mt-1.5 font-semibold text-stone-900">{d.foodType} · {d.meals} meals</div>
@@ -141,7 +141,7 @@ export function RestaurantDashboard() {
                           <button onClick={()=>{setConfirmingId(null); advance(d)}} className="text-xs font-semibold px-3.5 py-2 rounded-full border transition-colors bg-stone-900 text-white hover:bg-black border-stone-900">Mark claimed</button>
                         )}
                         {d.status!=='AVAILABLE' && (
-                          <button onClick={()=>advance(d)} disabled={d.status==='DELIVERED'} className={`text-xs font-semibold px-4 py-2 rounded-full border transition-colors ${d.status==='DELIVERED'?'bg-stone-50 text-stone-400 border-stone-200 cursor-not-allowed':'bg-stone-900 text-white hover:bg-black border-stone-900'}`}>{d.status==='CLAIMED'?'Move to pickup':d.status==='PICKUP'?'Mark delivered':'Completed'}</button>
+                          <button onClick={()=>advance(d)} disabled={d.status==='PICKED_UP'} className={`text-xs font-semibold px-4 py-2 rounded-full border transition-colors ${d.status==='PICKED_UP'?'bg-stone-50 text-stone-400 border-stone-200 cursor-not-allowed':'bg-stone-900 text-white hover:bg-black border-stone-900'}`}>{d.status==='CLAIMED'?'Mark picked up':'Completed'}</button>
                         )}
                         {d.status==='AVAILABLE' && (
                           <button onClick={()=>remove(d)} className={`text-xs font-semibold px-3.5 py-2 rounded-full border transition-colors ${confirmingId===d.id?'bg-red-600 text-white border-red-600':'bg-white text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300'}`}>{confirmingId===d.id?'Confirm?':'Delete'}</button>
@@ -151,7 +151,7 @@ export function RestaurantDashboard() {
                     <div className="mt-4 bg-[#FCFCF9] rounded-xl border border-stone-200 p-3">
                       <StatusStepper status={d.status} />
                       {d.status==='CLAIMED' && <div className="mt-2.5 text-xs font-medium text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">Claimed — prepare for pickup during the stated window.</div>}
-                      {d.status==='DELIVERED' && <div className="mt-2.5 text-xs font-medium text-leaf bg-[#F0FDF4] border border-green-200 rounded-xl px-3 py-2">Delivered — thank you for completing the loop.</div>}
+                      {d.status==='PICKED_UP' && <div className="mt-2.5 text-xs font-medium text-leaf bg-[#F0FDF4] border border-green-200 rounded-xl px-3 py-2">Picked up — thank you for completing the loop.</div>}
                     </div>
                   </motion.div>
                 ))}
