@@ -23,7 +23,7 @@ export function CreateDonation() {
 
   useEffect(() => {
     if (initializing) return
-    if (!user || user.role !== 'restaurant') nav('/login?role=restaurant')
+    if (!user || user.role !== 'restaurant') nav('/')
   }, [user, initializing, nav])
 
   if (initializing || !user || user.role !== 'restaurant') return null

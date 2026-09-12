@@ -27,7 +27,7 @@ export function RestaurantDashboard() {
 
   useEffect(() => {
     if (initializing) return
-    if (!user) nav('/login?role=restaurant')
+    if (!user) nav('/')
     else if (user.role !== 'restaurant') nav('/beneficiary/dashboard')
   }, [user, initializing, nav])
 
