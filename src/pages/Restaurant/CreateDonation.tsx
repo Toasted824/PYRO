@@ -24,7 +24,7 @@ export function CreateDonation() {
 
   const maxUntil = useMemo(() => {
     if (perishability !== 'perishable') return undefined
-    const d = new Date(Date.now() + 48 * 60 * 60 * 1000)
+    const d = new Date(Date.now() + 12 * 60 * 60 * 1000)
     return d.toISOString().slice(0, 16)
   }, [perishability])
 
@@ -49,8 +49,8 @@ export function CreateDonation() {
     if (!form.availableUntil) return setErr('Please set available until time')
     if (new Date(form.availableUntil).getTime() <= Date.now()) return setErr('Available until must be in the future')
     if (perishability === 'perishable') {
-      const max = Date.now() + 48 * 60 * 60 * 1000
-      if (new Date(form.availableUntil).getTime() > max) return setErr('Perishable food cannot be available for more than 48 hours — please choose an earlier pickup time or mark as non-perishable')
+      const max = Date.now() + 12 * 60 * 60 * 1000
+      if (new Date(form.availableUntil).getTime() > max) return setErr('Perishable food cannot be available for more than 12 hours — please choose an earlier pickup time or mark as non-perishable')
     }
     if (!location.label.trim()) return setErr('Pickup location is required — search a landmark or use current location')
     if (location.lat == null || location.lng == null) return setErr('Please pick a location on the map or choose a search result')
@@ -124,7 +124,7 @@ export function CreateDonation() {
                     Non-perishable
                   </button>
                 </div>
-                <p className="mt-1 text-[11px] text-stone-500">{perishability==='perishable' ? 'Must be picked up within 48 hours.' : 'No time limit — shelf-stable.'}</p>
+                <p className="mt-1 text-[11px] text-stone-500">{perishability==='perishable' ? 'Must be picked up within 12 hours.' : 'No time limit — shelf-stable.'}</p>
               </div>
             </div>
 
@@ -137,7 +137,7 @@ export function CreateDonation() {
               <label className="text-xs font-bold tracking-widest text-stone-500">AVAILABLE UNTIL</label>
               <input type="datetime-local" value={form.availableUntil || defaultUntil} onChange={e => setForm({ ...form, availableUntil: e.target.value })} max={maxUntil} className="mt-1 w-full rounded-xl border border-stone-200 bg-[#FFFBEB]/40 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20 focus:border-[#16A34A]" />
               {perishability==='perishable' ? (
-                <p className="mt-1 text-[11px] text-amber-700">Perishable foods cannot be available for more than 48 hours from now.</p>
+                <p className="mt-1 text-[11px] text-amber-700">Perishable foods cannot be available for more than 12 hours from now.</p>
               ) : (
                 <p className="mt-1 text-[11px] text-stone-400">Non-perishable — no date limit.</p>
               )}
