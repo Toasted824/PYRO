@@ -4,12 +4,14 @@ import { useAuth } from '../../lib/auth'
 import { createDonation } from '../../lib/store'
 import { FOOD_TYPES } from '../../lib/types'
 import { Header } from '../../components/layout/Header'
+import { LocationPicker, type LocationValue } from '../../components/map/LocationPicker'
 import { pushToast } from '../../components/ui/Toast'
 
 export function CreateDonation() {
   const { user, configured } = useAuth()
   const nav = useNavigate()
-  const [form, setForm] = useState({ foodType: FOOD_TYPES[0], meals: '10', availableUntil: '', pickupLocation: '', description: '', lat: '', lng: '' })
+  const [form, setForm] = useState({ foodType: FOOD_TYPES[0], meals: '10', availableUntil: '', description: '' })
+  const [location, setLocation] = useState<LocationValue>({ lat: null, lng: null, label: '' })
   const [err, setErr] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -25,10 +27,8 @@ export function CreateDonation() {
     if (!meals || meals < 1) return setErr('Number of meals must be at least 1')
     if (!form.availableUntil) return setErr('Please set available until time')
     if (new Date(form.availableUntil).getTime() <= Date.now()) return setErr('Available until must be in the future')
-    if (!form.pickupLocation.trim()) return setErr('Pickup location is required')
-    const lat = parseFloat(form.lat)
-    const lng = parseFloat(form.lng)
-    if (isNaN(lat) || isNaN(lng)) return setErr('Please enter valid coordinates')
+    if (!location.label.trim()) return setErr('Pickup location is required — search a landmark or use current location')
+    if (location.lat == null || location.lng == null) return setErr('Please pick a location on the map or choose a search result')
     setSubmitting(true)
     try {
       await createDonation({
@@ -37,9 +37,10 @@ export function CreateDonation() {
         foodType: form.foodType,
         meals,
         availableUntil: new Date(form.availableUntil).toISOString(),
-        pickupLocation: form.pickupLocation.trim(),
+        pickupLocation: location.label.trim(),
         description: form.description.trim(),
-        lat, lng,
+        lat: location.lat,
+        lng: location.lng,
       })
       pushToast('Your food is now in the loop. ♻')
       nav('/restaurant/dashboard')
@@ -97,18 +98,8 @@ export function CreateDonation() {
 
             <div>
               <label className="text-xs font-bold tracking-widest text-stone-500">PICKUP LOCATION</label>
-              <input value={form.pickupLocation} onChange={e => setForm({ ...form, pickupLocation: e.target.value })} placeholder="Thamel, Kathmandu - near Garden of Dreams" className="mt-1 w-full rounded-xl border border-stone-200 bg-[#FFFBEB]/40 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20 focus:border-[#16A34A]" />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-bold tracking-widest text-stone-500">LATITUDE</label>
-                <input value={form.lat} onChange={e => setForm({ ...form, lat: e.target.value })} placeholder="27.7172" className="mt-1 w-full rounded-xl border border-stone-200 bg-[#FFFBEB]/40 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20 focus:border-[#16A34A]" />
-              </div>
-              <div>
-                <label className="text-xs font-bold tracking-widest text-stone-500">LONGITUDE</label>
-                <input value={form.lng} onChange={e => setForm({ ...form, lng: e.target.value })} placeholder="85.3240" className="mt-1 w-full rounded-xl border border-stone-200 bg-[#FFFBEB]/40 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20 focus:border-[#16A34A]" />
-              </div>
+              <p className="text-xs text-stone-500 mt-1 mb-2">Search a landmark or use your current location — no coordinates needed.</p>
+              <LocationPicker value={location} onChange={setLocation} />
             </div>
 
             <div>
