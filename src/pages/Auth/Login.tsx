@@ -13,10 +13,15 @@ export function Login() {
   const [password, setPassword] = useState('')
   const [err, setErr] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const { login } = useAuth()
+  const { user, initializing, login } = useAuth()
   const nav = useNavigate()
 
   useEffect(() => { sessionStorage.setItem('foodloop_pending_role', role) }, [role])
+
+  useEffect(() => {
+    if (initializing || !user) return
+    nav(user.role === 'restaurant' ? '/restaurant/dashboard' : '/beneficiary/dashboard')
+  }, [user, initializing, nav])
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -60,12 +65,12 @@ export function Login() {
 
           <form onSubmit={submit} className="mt-6 space-y-4">
             <div>
-              <label className="text-xs font-bold tracking-widest text-stone-500">EMAIL</label>
-              <input value={email} onChange={e => setEmail(e.target.value)} placeholder="you@restaurant.com" className="mt-1 w-full rounded-xl border border-stone-200 bg-[#FFFBEB]/50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20 focus:border-[#16A34A]" />
+              <label htmlFor="login-email" className="text-xs font-bold tracking-widest text-stone-500">EMAIL</label>
+              <input id="login-email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@restaurant.com" className="mt-1 w-full rounded-xl border border-stone-200 bg-[#FFFBEB]/50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20 focus:border-[#16A34A]" />
             </div>
             <div>
-              <label className="text-xs font-bold tracking-widest text-stone-500">PASSWORD</label>
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" className="mt-1 w-full rounded-xl border border-stone-200 bg-[#FFFBEB]/50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20 focus:border-[#16A34A]" />
+              <label htmlFor="login-password" className="text-xs font-bold tracking-widest text-stone-500">PASSWORD</label>
+              <input id="login-password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" className="mt-1 w-full rounded-xl border border-stone-200 bg-[#FFFBEB]/50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20 focus:border-[#16A34A]" />
             </div>
             {err && <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2 rounded-xl">{err}</div>}
             <button type="submit" disabled={submitting} className="w-full bg-stone-900 hover:bg-black disabled:bg-stone-400 text-white font-extrabold py-3.5 rounded-full shadow transition">{submitting ? 'Logging in…' : 'Login →'}</button>

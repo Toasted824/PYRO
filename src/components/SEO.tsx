@@ -18,12 +18,15 @@ export function SEO({ title, description, canonicalPath, ogImage, noIndex }: SEO
   useEffect(() => {
     document.title = title
 
+    const created: Element[] = []
+
     const setMeta = (selector: string, value: string, attr: 'name' | 'property' = 'name') => {
       let el = document.querySelector(`meta[${attr}="${selector}"]`) as HTMLMetaElement | null
       if (!el) {
         el = document.createElement('meta')
         el.setAttribute(attr, selector)
         document.head.appendChild(el)
+        created.push(el)
       }
       el.setAttribute('content', value)
     }
@@ -44,6 +47,7 @@ export function SEO({ title, description, canonicalPath, ogImage, noIndex }: SEO
       link = document.createElement('link')
       link.rel = 'canonical'
       document.head.appendChild(link)
+      created.push(link)
     }
     link.href = canonical
 
@@ -53,10 +57,15 @@ export function SEO({ title, description, canonicalPath, ogImage, noIndex }: SEO
         robots = document.createElement('meta')
         robots.name = 'robots'
         document.head.appendChild(robots)
+        created.push(robots)
       }
       robots.content = 'noindex, nofollow'
     } else if (robots) {
       robots.content = 'index, follow'
+    }
+
+    return () => {
+      created.forEach(el => el.remove())
     }
   }, [title, description, canonical, image, noIndex])
 

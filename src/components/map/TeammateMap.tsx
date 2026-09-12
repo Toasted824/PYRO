@@ -111,6 +111,8 @@ export function TeammateMap({
             position={[d.lat, d.lng]}
             icon={selectedId === d.id ? selectedIcon : iconFor(d.status)}
             eventHandlers={{ click: () => onMarkerClick?.(d.id) }}
+            keyboard
+            title={`${d.restaurantName} — ${d.foodType}, ${d.meals} meals`}
           >
             <Popup autoPan maxWidth={260} closeButton>
               <div className="text-sm min-w-[180px]">

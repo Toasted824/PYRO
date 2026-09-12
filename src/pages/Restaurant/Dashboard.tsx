@@ -15,13 +15,14 @@ function timeLeft(iso: string) {
   const h = Math.floor(diff / 3600000)
   const m = Math.floor((diff % 3600000) / 60000)
   if (h > 0) return `${h}h ${m}m left`
+  if (m === 0) return 'Expiring soon'
   return `${m}m left`
 }
 
 export function RestaurantDashboard() {
   const { user, initializing, configured } = useAuth()
   const nav = useNavigate()
-  const { donations, loading, error, reload } = useDonations()
+  const { donations, loading, error, reload } = useDonations(user?.id)
   const [confirmingId, setConfirmingId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -61,14 +62,13 @@ export function RestaurantDashboard() {
       setConfirmingId(d.id)
       return
     }
+    setConfirmingId(null)
     try {
       await deleteDonation(d.id)
       pushToast('Listing removed')
       reload()
     } catch (e: unknown) {
       pushToast(e instanceof Error ? e.message : 'Delete failed', 'info')
-    } finally {
-      setConfirmingId(null)
     }
   }
 

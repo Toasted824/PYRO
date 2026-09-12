@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth, EmailConfirmationError } from '../../lib/auth'
 import { Header } from '../../components/layout/Header'
@@ -9,8 +9,13 @@ export function RegisterBeneficiary() {
   const [err, setErr] = useState('')
   const [info, setInfo] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const { register } = useAuth()
+  const { user, initializing, register } = useAuth()
   const nav = useNavigate()
+
+  useEffect(() => {
+    if (initializing || !user) return
+    nav(user.role === 'restaurant' ? '/restaurant/dashboard' : '/beneficiary/dashboard')
+  }, [user, initializing, nav])
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -64,10 +69,11 @@ export function RegisterBeneficiary() {
 }
 
 function Field({ label, value, onChange, placeholder, type = 'text' }: { label: string; value: string; onChange: (v: string) => void; placeholder: string; type?: string }) {
+  const id = `field-${label.toLowerCase().replace(/\s+/g, '-')}`
   return (
     <div>
-      <label className="text-xs font-bold tracking-widest text-stone-500">{label.toUpperCase()}</label>
-      <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="mt-1 w-full rounded-xl border border-stone-200 bg-sky-50/20 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500" />
+      <label htmlFor={id} className="text-xs font-bold tracking-widest text-stone-500">{label.toUpperCase()}</label>
+      <input id={id} type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="mt-1 w-full rounded-xl border border-stone-200 bg-sky-50/20 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500" />
     </div>
   )
 }

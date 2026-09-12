@@ -75,7 +75,7 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
         title={publicMode ? 'Browse available food — FoodLoop Kathmandu' : 'Find food nearby — FoodLoop Beneficiary'}
         description="Browse surplus food listings on a map in Kathmandu Valley, sorted by distance. Verified community kitchens can claim food for same day pickup."
         canonicalPath={publicMode ? '/explore' : '/beneficiary/dashboard'}
-        noIndex={Boolean(publicMode && !user) ? false : !publicMode ? true : true}
+        noIndex={!publicMode}
       />
       <Header />
       {/* single sub-header: title + search — decluttered */}

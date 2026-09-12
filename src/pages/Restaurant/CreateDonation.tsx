@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../lib/auth'
 import { createDonation } from '../../lib/store'
@@ -53,11 +53,11 @@ export function CreateDonation() {
     }
   }
 
-  const defaultUntil = () => {
+  const defaultUntil = useMemo(() => {
     const d = new Date(Date.now() + 3 * 60 * 60 * 1000)
     d.setMinutes(0, 0, 0)
     return d.toISOString().slice(0, 16)
-  }
+  }, [])
 
   return (
     <div className="min-h-screen bg-[#FFFBEB]">
@@ -95,7 +95,7 @@ export function CreateDonation() {
 
             <div>
               <label className="text-xs font-bold tracking-widest text-stone-500">AVAILABLE UNTIL</label>
-              <input type="datetime-local" value={form.availableUntil || defaultUntil()} onChange={e => setForm({ ...form, availableUntil: e.target.value })} className="mt-1 w-full rounded-xl border border-stone-200 bg-[#FFFBEB]/40 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20 focus:border-[#16A34A]" />
+              <input type="datetime-local" value={form.availableUntil || defaultUntil} onChange={e => setForm({ ...form, availableUntil: e.target.value })} className="mt-1 w-full rounded-xl border border-stone-200 bg-[#FFFBEB]/40 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20 focus:border-[#16A34A]" />
             </div>
 
             <div>

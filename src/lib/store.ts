@@ -49,6 +49,7 @@ export async function fetchDonations(): Promise<Donation[]> {
     .from('donations')
     .select('*')
     .order('created_at', { ascending: false })
+    .limit(200)
   if (error) throw error
   return (data ?? []).map(toDonation)
 }
@@ -110,7 +111,14 @@ export async function claimDonation(donationId: string, user: User): Promise<Don
     .eq('status', 'AVAILABLE')
     .select()
     .single()
-  if (error) throw error
+  if (error) {
+    const msg = error.message?.toLowerCase() ?? ''
+    if (msg.includes('row') || msg.includes('0 rows') || msg.includes('not found')) {
+      throw new Error('Sorry, someone else just claimed this donation')
+    }
+    throw error
+  }
+  if (!data) throw new Error('Sorry, someone else just claimed this donation')
   return toDonation(data as DonationRow)
 }
 
