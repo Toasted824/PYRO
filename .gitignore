@@ -12,6 +12,7 @@ dist
 dist-ssr
 .vite
 *.local
+1map/
 
 # Environment / secrets
 .env
