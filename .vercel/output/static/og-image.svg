@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+<title id="title">FoodLoop — Surplus food listings for Kathmandu Valley</title>
+<desc id="desc">A simple listing tool connecting restaurants with surplus meals to nearby community kitchens</desc>
+<rect width="1200" height="630" fill="#FFFBEB"/>
+<rect x="48" y="48" width="1104" height="534" rx="24" fill="white" stroke="#E7E5E4"/>
+<text x="80" y="120" font-family="Inter, sans-serif" font-size="16" font-weight="600" fill="#78716C" letter-spacing="2">KATHMANDU VALLEY</text>
+<text x="80" y="220" font-family="Inter, sans-serif" font-size="56" font-weight="800" fill="#1C1917">Restaurants post</text>
+<text x="80" y="285" font-family="Inter, sans-serif" font-size="56" font-weight="800" fill="#1C1917">surplus meals.</text>
+<text x="80" y="350" font-family="Inter, sans-serif" font-size="56" font-weight="800" fill="#16A34A">Shelters collect</text>
+<text x="80" y="415" font-family="Inter, sans-serif" font-size="56" font-weight="800" fill="#1C1917">them same day.</text>
+<text x="80" y="465" font-family="Inter, sans-serif" font-size="18" fill="#57534E">Post in one minute. Find nearby on a map. Coordinate pickup directly.</text>
+<rect x="80" y="505" width="160" height="44" rx="8" fill="#16A34A"/>
+<text x="160" y="533" font-family="Inter, sans-serif" font-size="15" font-weight="600" fill="white" text-anchor="middle">foodloop.org</text>
+<rect x="720" y="100" width="400" height="380" rx="16" fill="#FFFBEB" stroke="#E7E5E4"/>
+<text x="740" y="135" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#A8A29E" letter-spacing="1.5">EXAMPLE LISTING</text>
+<text x="740" y="170" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#1C1917">Kathmandu Kitchen, Thamel</text>
+<text x="740" y="192" font-family="Inter, sans-serif" font-size="13" fill="#57534E">Dal bhat · 12 meals · Pickup 8:00–9:30 pm</text>
+<rect x="740" y="210" width="360" height="1" fill="#E7E5E4"/>
+<text x="740" y="240" font-family="Inter, sans-serif" font-size="13" fill="#57534E">Cooked today, stored safely. Vegetarian.</text>
+<text x="740" y="258" font-family="Inter, sans-serif" font-size="13" fill="#57534E">Bring containers for pickup at back entrance.</text>
+</svg>
