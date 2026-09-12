@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom'
 import { Header } from '../components/layout/Header'
 import { SEO } from '../components/SEO'
+import { useAuth } from '../lib/auth'
 
 export function Landing() {
+  const { user, initializing } = useAuth()
+
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -25,6 +28,120 @@ export function Landing() {
     priceRange: 'Free',
   }
 
+  if (initializing) {
+    return (
+      <div className="min-h-screen bg-[#FFFBEB] grid place-items-center">
+        <div className="text-sm text-stone-500">Loading…</div>
+      </div>
+    )
+  }
+
+  // Authenticated homes — separate for restaurant vs beneficiary, no "Join FoodLoop" CTA
+  if (user) {
+    if (user.role === 'restaurant') {
+      return (
+        <div className="min-h-screen bg-[#FFFBEB] overflow-hidden">
+          <SEO title={`Welcome back, ${user.name} — FoodLoop Restaurant Home`} description="Your restaurant home on FoodLoop — post surplus food, track donations from Available to Delivered, and coordinate pickup with nearby kitchens." canonicalPath="/" />
+          <Header transparent />
+          <section className="relative geometric-grid">
+            <div aria-hidden="true" className="hero-blob -top-[160px] left-1/2 -translate-x-1/2 hidden sm:block" />
+            <div className="relative max-w-[900px] mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-10 text-center">
+              <div className="motion-fade-up inline-flex items-center gap-2 bg-white border border-stone-200 rounded-full px-4 py-1.5 text-xs font-semibold text-stone-600 shadow-sm">
+                <span className="w-2 h-2 bg-leaf rounded-full relative leaf-pulse" aria-hidden="true" /> Restaurant home · {user.location || 'Kathmandu Valley'}
+              </div>
+              <h1 className="motion-fade-up motion-delay-1 mt-6 font-display font-extrabold tracking-tight text-stone-900 leading-[0.92] text-[36px] sm:text-[54px]">
+                Welcome back,
+                <br />
+                <span className="text-leaf">{user.name}</span>
+              </h1>
+              <p className="motion-fade-up motion-delay-2 mt-4 text-[17px] leading-relaxed text-stone-600 max-w-[560px] mx-auto">
+                Share today&apos;s surplus in about a minute. Verified kitchens nearby will see it instantly on the map — you stay in control of what you list.
+              </p>
+              <p className="motion-fade-up motion-delay-2 mt-1 text-sm text-stone-500">Good food shouldn&apos;t be wasted — your next listing keeps the loop going.</p>
+              <div className="motion-fade-up motion-delay-3 mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Link to="/restaurant/dashboard" className="w-full sm:w-auto inline-flex items-center justify-center bg-leaf hover:bg-leaf-dark text-white font-semibold px-8 py-3.5 rounded-full shadow-[0_8px_24px_rgba(22,163,74,0.22)] transition-all">Go to dashboard →</Link>
+                <Link to="/restaurant/new" className="w-full sm:w-auto inline-flex items-center justify-center bg-stone-900 hover:bg-black text-white font-semibold px-8 py-3.5 rounded-full transition-colors">Post surplus food</Link>
+              </div>
+              <div className="motion-fade-up motion-delay-3 mt-3 text-xs text-stone-400">
+                <Link to="/how-it-works" className="hover:text-stone-600 underline underline-offset-4">How it works</Link> · <Link to="/explore" className="hover:text-stone-600 underline underline-offset-4">View public map</Link>
+              </div>
+            </div>
+          </section>
+          <section className="max-w-[900px] mx-auto px-4 sm:px-6 pb-10 grid sm:grid-cols-3 gap-3">
+            <Link to="/restaurant/dashboard" className="group bg-white rounded-2xl border border-stone-200 p-5 hover:border-stone-300 hover:shadow-sm hover:-translate-y-[1px] transition-all">
+              <div className="text-xs font-semibold tracking-widest text-leaf">DASHBOARD</div>
+              <div className="mt-1 font-semibold text-stone-900">Track your donations</div>
+              <div className="text-sm text-stone-600 leading-relaxed">Available → Claimed → Pickup → Delivered</div>
+              <div className="mt-3 text-sm font-medium text-stone-900 group-hover:gap-1.5 inline-flex items-center gap-1">Open dashboard <span>→</span></div>
+            </Link>
+            <Link to="/restaurant/new" className="group bg-leaf text-white rounded-2xl p-5 hover:bg-leaf-dark transition-colors">
+              <div className="text-xs font-semibold tracking-widest text-white/80">NEW LISTING</div>
+              <div className="mt-1 font-semibold">Post surplus food</div>
+              <div className="text-sm text-white/80 leading-relaxed">Meals, pickup window, and location — ~1 min</div>
+              <div className="mt-3 text-sm font-medium inline-flex items-center gap-1">Create listing <span>→</span></div>
+            </Link>
+            <Link to="/how-it-works" className="group bg-white rounded-2xl border border-stone-200 p-5 hover:border-stone-300 hover:shadow-sm transition-all">
+              <div className="text-xs font-semibold tracking-widest text-stone-400">HELP</div>
+              <div className="mt-1 font-semibold text-stone-900">How status works</div>
+              <div className="text-sm text-stone-600 leading-relaxed">What happens after a kitchen claims.</div>
+              <div className="mt-3 text-sm font-medium text-stone-900 inline-flex items-center gap-1">Learn more <span>→</span></div>
+            </Link>
+          </section>
+          <footer className="border-t border-stone-200 bg-white"><div className="max-w-[900px] mx-auto px-4 sm:px-6 py-6 text-sm text-stone-500 flex justify-between"><span>© 2026 FoodLoop · Restaurant home</span><Link to="/terms" className="underline underline-offset-4">Terms</Link></div></footer>
+        </div>
+      )
+    }
+
+    // beneficiary home
+    return (
+      <div className="min-h-screen bg-[#FFFBEB] overflow-hidden">
+        <SEO title={`Find food nearby — Welcome ${user.name}`} description="Your beneficiary home on FoodLoop — browse surplus food on a muted map sorted by distance, claim in one tap, and coordinate pickup same day in Kathmandu Valley." canonicalPath="/" />
+        <Header transparent />
+        <section className="relative geometric-grid">
+          <div aria-hidden="true" className="hero-blob -top-[160px] left-1/2 -translate-x-1/2 hidden sm:block" />
+          <div className="relative max-w-[900px] mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-10 text-center">
+            <div className="motion-fade-up inline-flex items-center gap-2 bg-white border border-stone-200 rounded-full px-4 py-1.5 text-xs font-semibold text-stone-600 shadow-sm">
+              <span className="w-2 h-2 bg-sky-500 rounded-full relative leaf-pulse" aria-hidden="true" /> Beneficiary home · {user.location || 'Kathmandu Valley'}
+            </div>
+            <h1 className="motion-fade-up motion-delay-1 mt-6 font-display font-extrabold tracking-tight text-stone-900 leading-[0.92] text-[36px] sm:text-[54px]">
+              Good food
+              <br />
+              <span className="text-leaf">near you, {user.name.split(' ')[0]}</span>
+            </h1>
+            <p className="motion-fade-up motion-delay-2 mt-1 text-sm text-stone-500">Verified kitchens only · No commission · Same-day pickup.</p>
+            <div className="motion-fade-up motion-delay-3 mt-8 flex items-center justify-center">
+              <Link to="/beneficiary/dashboard" className="inline-flex items-center justify-center bg-leaf hover:bg-leaf-dark text-white font-semibold px-8 py-3.5 rounded-full shadow-[0_8px_24px_rgba(22,163,74,0.22)] transition-all">Find food nearby</Link>
+            </div>
+            <div className="motion-fade-up motion-delay-3 mt-3 text-xs text-stone-400">
+              <Link to="/beneficiary/dashboard" className="hover:text-stone-600 underline underline-offset-4">My claimed</Link> · <Link to="/how-it-works" className="hover:text-stone-600 underline underline-offset-4">How it works</Link>
+            </div>
+          </div>
+        </section>
+        <section className="max-w-[900px] mx-auto px-4 sm:px-6 pb-10 grid sm:grid-cols-3 gap-3">
+          <Link to="/beneficiary/dashboard" className="group bg-white rounded-2xl border border-stone-200 p-5 hover:border-stone-300 hover:shadow-sm hover:-translate-y-[1px] transition-all">
+            <div className="text-xs font-semibold tracking-widest text-leaf">MAP</div>
+            <div className="mt-1 font-semibold text-stone-900">Available nearby</div>
+            <div className="text-sm text-stone-600 leading-relaxed">Sorted by distance · Carto Light map</div>
+            <div className="mt-3 text-sm font-medium text-stone-900 inline-flex items-center gap-1">Open map <span>→</span></div>
+          </Link>
+          <Link to="/beneficiary/dashboard" className="group bg-sky-50 border border-sky-200 rounded-2xl p-5 hover:border-sky-300 hover:shadow-sm transition-all">
+            <div className="text-xs font-semibold tracking-widest text-sky-700">CLAIMED</div>
+            <div className="mt-1 font-semibold text-stone-900">My claimed food</div>
+            <div className="text-sm text-stone-600 leading-relaxed">Pickup window + directions + status</div>
+            <div className="mt-3 text-sm font-medium text-sky-700 inline-flex items-center gap-1">View claimed <span>→</span></div>
+          </Link>
+          <Link to="/how-it-works" className="group bg-white rounded-2xl border border-stone-200 p-5 hover:border-stone-300 transition-all">
+            <div className="text-xs font-semibold tracking-widest text-stone-400">TRUST</div>
+            <div className="mt-1 font-semibold text-stone-900">How verification works</div>
+            <div className="text-sm text-stone-600 leading-relaxed">Verified kitchens · direct coordination</div>
+            <div className="mt-3 text-sm font-medium text-stone-900 inline-flex items-center gap-1">Learn more <span>→</span></div>
+          </Link>
+        </section>
+        <footer className="border-t border-stone-200 bg-white"><div className="max-w-[900px] mx-auto px-4 sm:px-6 py-6 text-sm text-stone-500 flex justify-between"><span>© 2026 FoodLoop · Beneficiary home</span><Link to="/terms" className="underline underline-offset-4">Terms</Link></div></footer>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-[#FFFBEB] overflow-hidden">
       <SEO
@@ -36,7 +153,7 @@ export function Landing() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusiness) }} />
       <Header transparent />
 
-      {/* HERO — slogan first, centered, airy */}
+      {/* HERO — slogan first, centered, airy — public only, no auth */}
       <section className="relative geometric-grid">
         <div aria-hidden="true" className="hero-blob -top-[180px] left-1/2 -translate-x-1/2 hidden sm:block" />
         <div aria-hidden="true" className="hero-blob -top-[120px] left-1/2 -translate-x-1/2 sm:hidden" style={{ width: 360, height: 360 }} />
