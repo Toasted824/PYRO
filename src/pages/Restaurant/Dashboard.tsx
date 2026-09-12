@@ -1,8 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { useAuth } from '../../lib/auth'
-import { updateDonationStatus } from '../../lib/store'
+import { deleteDonation, updateDonationStatus } from '../../lib/store'
 import { useDonations } from '../../hooks/useDonations'
 import { Header } from '../../components/layout/Header'
 import { StatusStepper } from '../../components/ui/StatusStepper'
@@ -22,6 +22,7 @@ export function RestaurantDashboard() {
   const { user, configured } = useAuth()
   const nav = useNavigate()
   const { donations, loading, error, reload } = useDonations()
+  const [confirmingId, setConfirmingId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!user) nav('/login?role=restaurant')
@@ -48,6 +49,22 @@ export function RestaurantDashboard() {
       reload()
     } catch (e: unknown) {
       pushToast(e instanceof Error ? e.message : 'Update failed', 'info')
+    }
+  }
+
+  const remove = async (d: Donation) => {
+    if (confirmingId !== d.id) {
+      setConfirmingId(d.id)
+      return
+    }
+    try {
+      await deleteDonation(d.id)
+      pushToast('Listing removed')
+      reload()
+    } catch (e: unknown) {
+      pushToast(e instanceof Error ? e.message : 'Delete failed', 'info')
+    } finally {
+      setConfirmingId(null)
     }
   }
 
@@ -119,7 +136,17 @@ export function RestaurantDashboard() {
                         {d.description && <div className="text-xs text-stone-500 mt-1 line-clamp-2 leading-relaxed">{d.description}</div>}
                         {d.claimedByName && <div className="mt-2 inline-flex bg-[#FFFBEB] border border-stone-200 text-stone-700 text-xs font-medium px-2.5 py-1 rounded-full">Claimed by {d.claimedByName}</div>}
                       </div>
-                      <button onClick={()=>advance(d)} disabled={d.status==='DELIVERED'} className={`shrink-0 text-xs font-semibold px-4 py-2 rounded-full border transition-colors ${d.status==='DELIVERED'?'bg-stone-50 text-stone-400 border-stone-200 cursor-not-allowed':'bg-stone-900 text-white hover:bg-black border-stone-900'}`}>{d.status==='AVAILABLE'?'Mark claimed':d.status==='CLAIMED'?'Move to pickup':d.status==='PICKUP'?'Mark delivered':'Completed'}</button>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {d.status==='AVAILABLE' && (
+                          <button onClick={()=>{setConfirmingId(null); advance(d)}} className="text-xs font-semibold px-3.5 py-2 rounded-full border transition-colors bg-stone-900 text-white hover:bg-black border-stone-900">Mark claimed</button>
+                        )}
+                        {d.status!=='AVAILABLE' && (
+                          <button onClick={()=>advance(d)} disabled={d.status==='DELIVERED'} className={`text-xs font-semibold px-4 py-2 rounded-full border transition-colors ${d.status==='DELIVERED'?'bg-stone-50 text-stone-400 border-stone-200 cursor-not-allowed':'bg-stone-900 text-white hover:bg-black border-stone-900'}`}>{d.status==='CLAIMED'?'Move to pickup':d.status==='PICKUP'?'Mark delivered':'Completed'}</button>
+                        )}
+                        {d.status==='AVAILABLE' && (
+                          <button onClick={()=>remove(d)} className={`text-xs font-semibold px-3.5 py-2 rounded-full border transition-colors ${confirmingId===d.id?'bg-red-600 text-white border-red-600':'bg-white text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300'}`}>{confirmingId===d.id?'Confirm?':'Delete'}</button>
+                        )}
+                      </div>
                     </div>
                     <div className="mt-4 bg-[#FCFCF9] rounded-xl border border-stone-200 p-3">
                       <StatusStepper status={d.status} />

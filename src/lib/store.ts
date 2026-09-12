@@ -108,6 +108,16 @@ export async function claimDonation(donationId: string, user: User): Promise<Don
   return toDonation(data as DonationRow)
 }
 
+export async function deleteDonation(donationId: string): Promise<void> {
+  if (!supabase) throw new Error('Supabase is not configured yet. Add your credentials in .env.')
+  const { error } = await supabase
+    .from('donations')
+    .delete()
+    .eq('id', donationId)
+    .eq('status', 'AVAILABLE')
+  if (error) throw error
+}
+
 export async function updateDonationStatus(donationId: string, status: DonationStatus): Promise<Donation> {
   if (!supabase) throw new Error('Supabase is not configured yet. Add your credentials in .env.')
   const { data, error } = await supabase
