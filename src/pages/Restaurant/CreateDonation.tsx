@@ -15,6 +15,12 @@ export function CreateDonation() {
   const [err, setErr] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
+  const defaultUntil = useMemo(() => {
+    const d = new Date(Date.now() + 3 * 60 * 60 * 1000)
+    d.setMinutes(0, 0, 0)
+    return d.toISOString().slice(0, 16)
+  }, [])
+
   useEffect(() => {
     if (initializing) return
     if (!user || user.role !== 'restaurant') nav('/login?role=restaurant')
@@ -52,12 +58,6 @@ export function CreateDonation() {
       setSubmitting(false)
     }
   }
-
-  const defaultUntil = useMemo(() => {
-    const d = new Date(Date.now() + 3 * 60 * 60 * 1000)
-    d.setMinutes(0, 0, 0)
-    return d.toISOString().slice(0, 16)
-  }, [])
 
   return (
     <div className="min-h-screen bg-[#FFFBEB]">
