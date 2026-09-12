@@ -1,5 +1,7 @@
 export type Role = 'restaurant' | 'beneficiary'
 export type DonationStatus = 'AVAILABLE' | 'CLAIMED' | 'PICKED_UP'
+// Legacy statuses kept for backward compatibility with DB rows not yet migrated
+export type LegacyDonationStatus = DonationStatus | 'PICKUP' | 'DELIVERED'
 
 export interface User {
   id: string

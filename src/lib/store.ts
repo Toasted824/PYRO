@@ -10,12 +10,18 @@ interface DonationRow {
   available_until: string
   pickup_location: string
   description: string | null
-  status: DonationStatus
+  status: string
   claimed_by: string | null
   claimed_by_name: string | null
   lat: number
   lng: number
   created_at: string
+}
+
+function normalizeStatus(s: string): DonationStatus {
+  if (s === 'PICKUP' || s === 'DELIVERED') return 'PICKED_UP'
+  if (s === 'PICKED_UP' || s === 'CLAIMED' || s === 'AVAILABLE') return s as DonationStatus
+  return 'AVAILABLE'
 }
 
 function toDonation(row: DonationRow): Donation {
@@ -28,7 +34,7 @@ function toDonation(row: DonationRow): Donation {
     availableUntil: row.available_until,
     pickupLocation: row.pickup_location,
     description: row.description ?? undefined,
-    status: row.status,
+    status: normalizeStatus(row.status),
     claimedBy: row.claimed_by ?? undefined,
     claimedByName: row.claimed_by_name ?? undefined,
     lat: row.lat,
@@ -120,13 +126,36 @@ export async function deleteDonation(donationId: string): Promise<void> {
 
 export async function updateDonationStatus(donationId: string, status: DonationStatus): Promise<Donation> {
   if (!supabase) throw new Error('Supabase is not configured yet. Add your credentials in .env.')
-  const { data, error } = await supabase
+  // Try with new status first
+  let { data, error } = await supabase
     .from('donations')
     .update({ status })
     .eq('id', donationId)
     .select()
     .single()
-  if (error) throw error
+  if (error) {
+    const msg = error.message?.toLowerCase() ?? ''
+    const isConstraint = msg.includes('check') || msg.includes('violates') || msg.includes('invalid input')
+    // Fallback for DBs not yet migrated (still expects PICKUP/DELIVERED)
+    if (isConstraint && status === 'PICKED_UP') {
+      const fallback = 'DELIVERED' as unknown as string
+      const retry = await supabase
+        .from('donations')
+        .update({ status: fallback })
+        .eq('id', donationId)
+        .select()
+        .single()
+      if (retry.error) {
+        // surface helpful instruction
+        throw new Error(retry.error.message + ' — Please run supabase/migrations/0002_merge_pickup_delivered.sql in Supabase SQL Editor.')
+      }
+      return toDonation(retry.data as DonationRow)
+    }
+    if (isConstraint) {
+      throw new Error(error.message + ' — Please run supabase/migrations/0002_merge_pickup_delivered.sql in Supabase SQL Editor.')
+    }
+    throw error
+  }
   return toDonation(data as DonationRow)
 }
 

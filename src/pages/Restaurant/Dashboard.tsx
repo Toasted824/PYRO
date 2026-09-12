@@ -41,14 +41,17 @@ export function RestaurantDashboard() {
 
   const advance = async (d: Donation) => {
     const order: Donation['status'][] = ['AVAILABLE', 'CLAIMED', 'PICKED_UP']
-    const idx = order.indexOf(d.status)
+    // Normalize legacy statuses (PICKUP/DELIVERED -> PICKED_UP) for index lookup
+    const raw = d.status as unknown as string
+    const normalized = (raw === 'PICKUP' || raw === 'DELIVERED') ? 'PICKED_UP' as const : d.status
+    const idx = order.indexOf(normalized)
     if (idx >= order.length - 1) return
     try {
       await updateDonationStatus(d.id, order[idx + 1])
       pushToast(`Moved to ${order[idx + 1].replace('_', ' ')}`)
       reload()
     } catch (e: unknown) {
-      pushToast(e instanceof Error ? e.message : 'Update failed', 'info')
+      pushToast(e instanceof Error ? e.message : 'Update failed — please run 0002_merge_pickup_delivered.sql', 'info')
     }
   }
 
