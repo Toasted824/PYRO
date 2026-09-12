@@ -9,6 +9,7 @@ export function useDonations(restaurantId?: string) {
 
   const load = useCallback(async () => {
     try {
+      setLoading(true)
       setDonations(restaurantId ? await fetchRestaurantDonations(restaurantId) : await fetchDonations())
       setError('')
     } catch (e: unknown) {
@@ -19,9 +20,25 @@ export function useDonations(restaurantId?: string) {
   }, [restaurantId])
 
   useEffect(() => {
-    load()
-    const unsubscribe = subscribeToDonations(load)
+    let cancelled = false
+    const run = async () => {
+      try {
+        setLoading(true)
+        const data = restaurantId ? await fetchRestaurantDonations(restaurantId) : await fetchDonations()
+        if (!cancelled) {
+          setDonations(data)
+          setError('')
+        }
+      } catch (e: unknown) {
+        if (!cancelled) setError(e instanceof Error ? e.message : 'Could not load donations')
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    run()
+    const unsubscribe = subscribeToDonations(run)
     return () => {
+      cancelled = true
       unsubscribe()
     }
   }, [load])

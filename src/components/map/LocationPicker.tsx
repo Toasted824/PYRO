@@ -53,7 +53,15 @@ export function LocationPicker({
   const [error, setError] = useState('')
   const [open, setOpen] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
+  const geoAbortRef = useRef<AbortController | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort()
+      geoAbortRef.current?.abort()
+    }
+  }, [])
 
   useEffect(() => {
     setQuery(value.label)
@@ -109,14 +117,20 @@ export function LocationPicker({
   }
 
   const handleMapPick = async (lat: number, lng: number) => {
+    geoAbortRef.current?.abort()
     const ac = new AbortController()
+    geoAbortRef.current = ac
     try {
       const r = await reverseNominatim(lat, lng, ac.signal)
-      onChange({ lat, lng, label: r.display_name })
-      setQuery(r.display_name)
+      if (!ac.signal.aborted) {
+        onChange({ lat, lng, label: r.display_name })
+        setQuery(r.display_name)
+      }
     } catch {
-      onChange({ lat, lng, label: `${lat.toFixed(5)}, ${lng.toFixed(5)}` })
-      setQuery(`${lat.toFixed(5)}, ${lng.toFixed(5)}`)
+      if (!ac.signal.aborted) {
+        onChange({ lat, lng, label: `${lat.toFixed(5)}, ${lng.toFixed(5)}` })
+        setQuery(`${lat.toFixed(5)}, ${lng.toFixed(5)}`)
+      }
     }
   }
 
@@ -131,16 +145,22 @@ export function LocationPicker({
       async (pos) => {
         const lat = pos.coords.latitude
         const lng = pos.coords.longitude
+        geoAbortRef.current?.abort()
         const ac = new AbortController()
+        geoAbortRef.current = ac
         try {
           const r = await reverseNominatim(lat, lng, ac.signal)
-          onChange({ lat, lng, label: r.display_name })
-          setQuery(r.display_name)
+          if (!ac.signal.aborted) {
+            onChange({ lat, lng, label: r.display_name })
+            setQuery(r.display_name)
+          }
         } catch {
-          onChange({ lat, lng, label: `${lat.toFixed(5)}, ${lng.toFixed(5)}` })
-          setQuery(`${lat.toFixed(5)}, ${lng.toFixed(5)}`)
+          if (!ac.signal.aborted) {
+            onChange({ lat, lng, label: `${lat.toFixed(5)}, ${lng.toFixed(5)}` })
+            setQuery(`${lat.toFixed(5)}, ${lng.toFixed(5)}`)
+          }
         } finally {
-          setGeoLoading(false)
+          if (!ac.signal.aborted) setGeoLoading(false)
         }
       },
       (err) => {

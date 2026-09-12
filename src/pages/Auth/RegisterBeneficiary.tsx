@@ -24,6 +24,7 @@ export function RegisterBeneficiary() {
     if (!form.name.trim()) return setErr('Organization name is required')
     if (!form.location.trim()) return setErr('Location is required')
     if (!form.contact.trim()) return setErr('Contact is required')
+    if (form.contact.trim().length < 7) return setErr('Contact looks too short — enter a valid phone number')
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return setErr('Enter a valid email')
     if (form.password.length < 6) return setErr('Password must be at least 6 characters')
     setSubmitting(true)
