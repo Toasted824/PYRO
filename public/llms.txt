@@ -1,0 +1,22 @@
+# FoodLoop
+
+> FoodLoop is a non-commercial surplus food listing tool for Kathmandu Valley. Restaurants post surplus meals, verified community kitchens find them on a map and coordinate same-day pickup.
+
+## Site
+- URL: https://foodloop.org
+- Location: Kathmandu Valley, Nepal
+- Contact: via registration on site
+
+## Pages
+- Home: https://foodloop.org/ — Restaurants post surplus meals, shelters collect them same day.
+- How it works: https://foodloop.org/how-it-works — Three steps: post, discover, pickup.
+- About: https://foodloop.org/about — Why FoodLoop exists and how verification works.
+- Project status: https://foodloop.org/impact — Current scope and how impact will be measured.
+- Join: https://foodloop.org/join — Choose restaurant or community kitchen.
+- Explore: https://foodloop.org/explore — Public map of available food.
+- Terms: https://foodloop.org/terms — Terms and food safety responsibilities.
+
+## Notes
+- No AI generated images.
+- No fake metrics. Counts shown only after real donations are completed.
+- Surplus handling and food safety remain the responsibility of participants.

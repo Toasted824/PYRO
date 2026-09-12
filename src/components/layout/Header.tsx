@@ -5,33 +5,48 @@ export function Header({ transparent }: { transparent?: boolean }) {
   const { user, logout } = useAuth()
   const nav = useNavigate()
   return (
-    <header className={`sticky top-0 z-40 backdrop-blur-md border-b ${transparent ? 'bg-white/70 border-stone-200' : 'bg-white/90 border-stone-200'}`}>
+    <header className={`sticky top-0 z-40 border-b ${transparent ? 'bg-white/80 backdrop-blur border-stone-200' : 'bg-white border-stone-200'}`}>
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 h-[64px] flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2.5">
-          <span className="w-9 h-9 rounded-xl bg-[#16A34A] grid place-items-center text-white text-[18px]">♻</span>
-          <span className="font-black tracking-tight text-[22px] text-stone-900">FoodLoop</span>
-          <span className="hidden sm:inline text-[12px] font-semibold tracking-widest text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full -ml-0">CONNECTING FOOD • COMMUNITY</span>
+          <span className="w-9 h-9 rounded-lg bg-leaf flex items-center justify-center text-white text-[13px] font-black tracking-tight">
+            FL
+          </span>
+          <span className="font-bold tracking-tight text-[19px] text-stone-900">FoodLoop</span>
+          <span className="hidden sm:inline text-[11px] font-semibold tracking-widest text-stone-500 bg-stone-100 px-2 py-0.5 rounded-md">
+            Kathmandu Valley
+          </span>
         </Link>
-        <nav className="flex items-center gap-2 sm:gap-3">
+        <nav className="flex items-center gap-1 sm:gap-2">
           {!user ? (
             <>
-              <Link to="/explore" className="hidden sm:inline-flex text-sm font-medium text-stone-600 hover:text-stone-900 px-3 py-2">Explore food</Link>
-              <Link to="/login" className="text-sm font-semibold text-stone-700 hover:text-stone-900 px-3 py-2">Log in</Link>
-              <Link to="/join" className="inline-flex items-center justify-center bg-[#16A34A] hover:bg-[#15803D] text-white text-sm font-bold px-5 py-2.5 rounded-full shadow-sm transition">Join FoodLoop</Link>
+              <Link to="/how-it-works" className="hidden md:inline-flex text-sm font-medium text-stone-600 hover:text-stone-900 px-3 py-2">
+                How it works
+              </Link>
+              <Link to="/about" className="hidden md:inline-flex text-sm font-medium text-stone-600 hover:text-stone-900 px-3 py-2">
+                About
+              </Link>
+              <Link to="/explore" className="hidden sm:inline-flex text-sm font-medium text-stone-600 hover:text-stone-900 px-3 py-2">
+                Explore
+              </Link>
+              <Link to="/login" className="text-sm font-medium text-stone-700 hover:text-stone-900 px-3 py-2">
+                Log in
+              </Link>
+              <Link to="/join" className="inline-flex items-center justify-center bg-leaf hover:bg-leaf-dark text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors">
+                Join FoodLoop
+              </Link>
             </>
           ) : (
             <>
-              <span className="hidden md:inline-flex items-center gap-2 text-sm bg-stone-900 text-white px-3 py-1.5 rounded-full">
-                <span>{user.role === 'restaurant' ? '🍽️' : '🤝'}</span> {user.name}
-                <span className="opacity-60 text-xs capitalize">• {user.role}</span>
+              <span className="hidden md:inline-flex items-center gap-2 text-sm bg-stone-900 text-white px-3 py-1.5 rounded-md">
+                {user.name}
+                <span className="opacity-60 text-xs capitalize">· {user.role}</span>
               </span>
-              <Link
-                to={user.role === 'restaurant' ? '/restaurant/dashboard' : '/beneficiary/dashboard'}
-                className="text-sm font-semibold bg-white border border-stone-200 px-4 py-2 rounded-full hover:bg-stone-50"
-              >
+              <Link to={user.role === 'restaurant' ? '/restaurant/dashboard' : '/beneficiary/dashboard'} className="inline-flex text-sm font-medium bg-white border border-stone-200 px-4 py-2 rounded-lg hover:bg-stone-50 transition-colors">
                 Dashboard
               </Link>
-              <button onClick={() => { void logout(); nav('/') }} className="text-sm font-medium text-stone-500 hover:text-stone-900 px-3 py-2">Log out</button>
+              <button onClick={() => { logout(); nav('/') }} className="text-sm font-medium text-stone-500 hover:text-stone-900 px-3 py-2">
+                Log out
+              </button>
             </>
           )}
         </nav>

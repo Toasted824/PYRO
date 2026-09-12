@@ -18,3 +18,55 @@
 
 html { scroll-behavior: smooth; }
 body { background: #FFFBEB; color: #1C1917; }
+
+.geometric-grid {
+  background-image: radial-gradient(circle at 1px 1px, rgba(28,25,23,0.06) 1px, transparent 0);
+  background-size: 20px 20px;
+}
+
+/* fluid motion base — jitter.video inspired */
+@keyframes hero-blob-float {
+  0%, 100% { transform: translate3d(0,0,0) scale(1); }
+  50% { transform: translate3d(6px,-10px,0) scale(1.02); }
+}
+@keyframes pulse-leaf {
+  0% { transform: scale(0.85); opacity: 0.55; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.motion-fade-up { animation: fade-up 0.7s cubic-bezier(0.22,1,0.36,1) both; }
+.motion-delay-1 { animation-delay: 0.08s; }
+.motion-delay-2 { animation-delay: 0.18s; }
+.motion-delay-3 { animation-delay: 0.30s; }
+.hero-blob {
+  position: absolute;
+  inset: auto;
+  width: 640px;
+  height: 640px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(22,163,74,0.14), transparent 62%),
+              radial-gradient(circle at 70% 70%, rgba(249,115,22,0.10), transparent 60%),
+              radial-gradient(circle at 50% 50%, rgba(255,251,235,0.9), transparent 70%);
+  filter: blur(18px);
+  animation: hero-blob-float 9s ease-in-out infinite;
+  pointer-events: none;
+}
+.leaf-pulse::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid rgba(22,163,74,0.35);
+  animation: pulse-leaf 2.2s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  .hero-blob { animation: none !important; }
+}

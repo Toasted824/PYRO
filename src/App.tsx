@@ -1,22 +1,45 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Suspense, lazy } from 'react'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { AnimatePresence, motion } from 'motion/react'
 import { AuthProvider } from './lib/auth'
-import { Landing } from './pages/Landing'
-import { Join } from './pages/Join'
-import { Login } from './pages/Auth/Login'
-import { RegisterRestaurant } from './pages/Auth/RegisterRestaurant'
-import { RegisterBeneficiary } from './pages/Auth/RegisterBeneficiary'
-import { CreateDonation } from './pages/Restaurant/CreateDonation'
-import { RestaurantDashboard } from './pages/Restaurant/Dashboard'
-import { BeneficiaryDashboard } from './pages/Beneficiary/Dashboard'
 import { ToastHost } from './components/ui/Toast'
 
-export default function App() {
+const Landing = lazy(() => import('./pages/Landing').then(m => ({ default: m.Landing })))
+const HowItWorks = lazy(() => import('./pages/HowItWorks').then(m => ({ default: m.HowItWorks })))
+const About = lazy(() => import('./pages/About').then(m => ({ default: m.About })))
+const Impact = lazy(() => import('./pages/Impact').then(m => ({ default: m.Impact })))
+const Join = lazy(() => import('./pages/Join').then(m => ({ default: m.Join })))
+const Terms = lazy(() => import('./pages/Terms').then(m => ({ default: m.Terms })))
+const Login = lazy(() => import('./pages/Auth/Login').then(m => ({ default: m.Login })))
+const RegisterRestaurant = lazy(() => import('./pages/Auth/RegisterRestaurant').then(m => ({ default: m.RegisterRestaurant })))
+const RegisterBeneficiary = lazy(() => import('./pages/Auth/RegisterBeneficiary').then(m => ({ default: m.RegisterBeneficiary })))
+const CreateDonation = lazy(() => import('./pages/Restaurant/CreateDonation').then(m => ({ default: m.CreateDonation })))
+const RestaurantDashboard = lazy(() => import('./pages/Restaurant/Dashboard').then(m => ({ default: m.RestaurantDashboard })))
+const BeneficiaryDashboard = lazy(() => import('./pages/Beneficiary/Dashboard').then(m => ({ default: m.BeneficiaryDashboard })))
+const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })))
+
+function Fallback() {
+  return <div className="min-h-screen bg-[#FFFBEB] grid place-items-center text-sm text-stone-500">Loading…</div>
+}
+
+function AnimatedRoutes() {
+  const location = useLocation()
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -6 }}
+        transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <Routes location={location}>
           <Route path="/" element={<Landing />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/impact" element={<Impact />} />
           <Route path="/join" element={<Join />} />
+          <Route path="/terms" element={<Terms />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register/restaurant" element={<RegisterRestaurant />} />
           <Route path="/register/beneficiary" element={<RegisterBeneficiary />} />
@@ -24,8 +47,20 @@ export default function App() {
           <Route path="/restaurant/new" element={<CreateDonation />} />
           <Route path="/beneficiary/dashboard" element={<BeneficiaryDashboard />} />
           <Route path="/explore" element={<BeneficiaryDashboard publicMode />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
+      </motion.div>
+    </AnimatePresence>
+  )
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Suspense fallback={<Fallback />}>
+          <AnimatedRoutes />
+        </Suspense>
         <ToastHost />
       </BrowserRouter>
     </AuthProvider>

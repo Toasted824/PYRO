@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { motion } from 'motion/react'
 import { useAuth } from '../../lib/auth'
 import { updateDonationStatus } from '../../lib/store'
 import { useDonations } from '../../hooks/useDonations'
@@ -33,7 +34,6 @@ export function RestaurantDashboard() {
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   )
 
-  const claimedCount = myDonations.filter(d => d.status !== 'AVAILABLE').length
   const mealsShared = myDonations
     .filter(d => d.status === 'DELIVERED' || d.status === 'PICKUP' || d.status === 'CLAIMED')
     .reduce((a, b) => a + b.meals, 0)
@@ -55,15 +55,15 @@ export function RestaurantDashboard() {
     <div className="min-h-screen bg-[#FFFBEB]">
       <Header />
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 pt-6 pb-10">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: [0.22,1,0.36,1] }} className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-[26px] font-black tracking-tight text-stone-900">Restaurant Dashboard</h1>
-            <p className="text-sm text-stone-600">Welcome, <span className="font-bold text-stone-900">{user.name}</span> • {user.location} • Track your loop</p>
+            <h1 className="text-[26px] font-display font-bold tracking-tight text-stone-900">Restaurant Dashboard</h1>
+            <p className="text-sm text-stone-600">Welcome, <span className="font-semibold text-stone-900">{user.name}</span> · {user.location} · Track your loop</p>
           </div>
-          <Link to="/restaurant/new" className="inline-flex items-center gap-2 bg-[#16A34A] hover:bg-[#15803D] text-white font-extrabold px-6 py-3 rounded-full shadow transition">
-            <span className="w-6 h-6 rounded-full bg-white text-[#16A34A] grid place-items-center text-[16px] leading-none">+</span> Add Available Food
+          <Link to="/restaurant/new" className="inline-flex items-center gap-2 bg-leaf hover:bg-leaf-dark text-white font-semibold px-6 py-3 rounded-full shadow-[0_6px_16px_rgba(22,163,74,0.20)] hover:shadow-[0_8px_20px_rgba(22,163,74,0.26)] hover:-translate-y-[1px] active:translate-y-0 transition-all">
+            Add available food
           </Link>
-        </div>
+        </motion.div>
 
         {!configured && (
           <div className="mt-6 bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-900">
@@ -71,102 +71,96 @@ export function RestaurantDashboard() {
             <div className="mt-1">Add your project credentials to <code className="bg-white border border-amber-200 rounded px-1.5 py-0.5 text-xs">.env</code> (see README) to start sharing real food.</div>
           </div>
         )}
+        {error && <div className="mt-4 bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2 rounded-xl">{error}</div>}
 
-        {error && <div className="mt-6 bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2 rounded-xl">{error}</div>}
-
-        {/* Stats */}
-        <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {/* decluttered stats — 3 with leaf accent, less noise than 4 */}
+        <div className="mt-6 grid grid-cols-3 gap-3">
           {[
-            { label: 'Active donations', value: myDonations.filter(d => d.status === 'AVAILABLE').length, icon: '●', bg: 'bg-white' },
-            { label: 'Claimed', value: myDonations.filter(d => d.status === 'CLAIMED').length, icon: '✓', bg: 'bg-amber-50' },
-            { label: 'Meals shared', value: mealsShared, icon: '🍽️', bg: 'bg-[#F0FDF4]' },
-            { label: 'Impact', value: `${claimedCount}/${myDonations.length}`, icon: '♻', bg: 'bg-stone-900 text-white' },
-          ].map(s => (
-            <div key={s.label} className={`${s.bg} rounded-2xl border border-stone-200 p-4`}>
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold tracking-widest text-stone-500">{s.label.toUpperCase()}</span>
-                <span className="w-7 h-7 rounded-full bg-stone-100 grid place-items-center text-xs">{s.icon}</span>
-              </div>
-              <div className={`mt-1 text-[28px] font-black ${s.bg.includes('stone-900') ? 'text-white' : 'text-stone-900'}`}>{s.value}</div>
-            </div>
+            { label: 'Active', value: myDonations.filter(d=>d.status==='AVAILABLE').length, hint: 'on map now' },
+            { label: 'Claimed', value: myDonations.filter(d=>d.status==='CLAIMED').length, hint: 'awaiting pickup' },
+            { label: 'Meals shared', value: mealsShared, hint: 'claimed/pickup/delivered' },
+          ].map((s, i)=> (
+            <motion.div key={s.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06*i, duration: 0.4 }} className="bg-white rounded-2xl border border-stone-200 p-4 pt-3.5 relative overflow-hidden hover:shadow-sm hover:-translate-y-[1px] transition-all">
+              <div className="absolute top-0 left-0 right-0 h-[3px] bg-leaf" aria-hidden="true" />
+              <div className="text-[11px] font-semibold tracking-widest text-stone-400">{s.label.toUpperCase()}</div>
+              <div className="mt-1 text-[26px] font-bold text-stone-900 leading-none">{s.value}</div>
+              <div className="text-xs text-stone-500 mt-1">{s.hint}</div>
+            </motion.div>
           ))}
         </div>
 
-        <div className="mt-6 grid lg:grid-cols-[1.1fr_0.9fr] gap-6">
-          {/* My donations */}
-          <div className="bg-white rounded-[24px] border border-stone-200 p-5 sm:p-6 shadow-sm">
+        <div className="mt-6 grid lg:grid-cols-[1.35fr_0.75fr] gap-6">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6">
             <div className="flex items-center justify-between">
-              <h2 className="font-extrabold text-stone-900">Your donations</h2>
-              <span className="text-xs bg-stone-100 border border-stone-200 px-2.5 py-1 rounded-full font-bold">{myDonations.length} total</span>
+              <h2 className="font-semibold text-stone-900">Your donations</h2>
+              <span className="text-xs bg-stone-50 border border-stone-200 px-2.5 py-1 rounded-full font-medium text-stone-600">{myDonations.length} total</span>
             </div>
             {loading && myDonations.length === 0 ? (
               <div className="mt-6 text-center py-10 text-sm text-stone-500">Loading donations…</div>
             ) : myDonations.length === 0 ? (
-              <div className="mt-6 text-center py-10 bg-[#FFFBEB] rounded-2xl border border-dashed border-amber-200">
-                <div className="text-3xl">🍲</div>
-                <div className="mt-2 font-bold text-stone-900">No donations yet</div>
-                <div className="text-sm text-stone-500">Click “Add Available Food” to start the loop</div>
-                <Link to="/restaurant/new" className="mt-4 inline-flex bg-[#16A34A] text-white font-bold px-5 py-2 rounded-full text-sm">+ Add Available Food</Link>
+              <div className="mt-6 text-center py-12 bg-[#FFFBEB]/50 rounded-2xl border border-dashed border-stone-200">
+                <div className="w-10 h-10 rounded-full bg-white border border-stone-200 grid place-items-center mx-auto text-stone-400">＋</div>
+                <div className="mt-3 font-semibold text-stone-900">No donations yet</div>
+                <div className="text-sm text-stone-500">Add your first listing — takes about a minute</div>
+                <Link to="/restaurant/new" className="mt-4 inline-flex bg-leaf text-white font-semibold px-6 py-2.5 rounded-full text-sm hover:bg-leaf-dark transition-colors">Add available food</Link>
               </div>
             ) : (
-              <div className="mt-4 space-y-4">
-                {myDonations.map(d => (
-                  <div key={d.id} className="rounded-2xl border border-stone-200 p-4 hover:shadow-sm transition bg-[#FFFBEB]/30">
+              <div className="mt-4 space-y-3">
+                {myDonations.map(d=> (
+                  <motion.div key={d.id} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-2xl border border-stone-200 p-4 bg-white hover:border-stone-300 hover:shadow-sm transition-all">
                     <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className={`text-[11px] font-black tracking-widest px-2 py-0.5 rounded-full border ${d.status === 'AVAILABLE' ? 'bg-[#F0FDF4] border-green-200 text-[#16A34A]' : d.status === 'CLAIMED' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-sky-50 border-sky-200 text-sky-700'}`}>{d.status}</span>
-                          <span className="text-xs text-stone-500">{timeLeft(d.availableUntil)} • {d.meals} meals</span>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`text-[11px] font-semibold tracking-widest px-2.5 py-1 rounded-full border ${d.status==='AVAILABLE'?'bg-[#F0FDF4] border-green-200 text-leaf': d.status==='CLAIMED'?'bg-amber-50 border-amber-200 text-amber-700':'bg-sky-50 border-sky-200 text-sky-700'}`}>{d.status}</span>
+                          <span className="text-xs text-stone-500">{timeLeft(d.availableUntil)} · {d.meals} meals</span>
                         </div>
-                        <div className="mt-1 font-bold text-stone-900">{d.foodType} • {d.meals} meals</div>
-                        <div className="text-sm text-stone-600">{d.pickupLocation} • Until {new Date(d.availableUntil).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                        {d.description && <div className="text-xs text-stone-500 mt-1 line-clamp-2">{d.description}</div>}
-                        {d.claimedByName && <div className="mt-2 inline-flex items-center gap-1.5 bg-amber-100 border border-amber-200 text-amber-900 text-xs font-semibold px-2.5 py-1 rounded-full">🤝 Claimed by {d.claimedByName}</div>}
+                        <div className="mt-1.5 font-semibold text-stone-900">{d.foodType} · {d.meals} meals</div>
+                        <div className="text-sm text-stone-600 truncate">{d.pickupLocation} · Until {new Date(d.availableUntil).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+                        {d.description && <div className="text-xs text-stone-500 mt-1 line-clamp-2 leading-relaxed">{d.description}</div>}
+                        {d.claimedByName && <div className="mt-2 inline-flex bg-[#FFFBEB] border border-stone-200 text-stone-700 text-xs font-medium px-2.5 py-1 rounded-full">Claimed by {d.claimedByName}</div>}
                       </div>
-                      <button onClick={() => advance(d)} disabled={d.status === 'DELIVERED'} className={`shrink-0 text-xs font-bold px-3 py-1.5 rounded-full border transition ${d.status === 'DELIVERED' ? 'bg-stone-100 text-stone-400 border-stone-200 cursor-not-allowed' : 'bg-white hover:bg-stone-900 hover:text-white border-stone-200'}`}>{d.status === 'AVAILABLE' ? 'Mark claimed' : d.status === 'CLAIMED' ? '→ Pickup' : d.status === 'PICKUP' ? '→ Delivered' : 'Completed ✓'}</button>
+                      <button onClick={()=>advance(d)} disabled={d.status==='DELIVERED'} className={`shrink-0 text-xs font-semibold px-4 py-2 rounded-full border transition-colors ${d.status==='DELIVERED'?'bg-stone-50 text-stone-400 border-stone-200 cursor-not-allowed':'bg-stone-900 text-white hover:bg-black border-stone-900'}`}>{d.status==='AVAILABLE'?'Mark claimed':d.status==='CLAIMED'?'Move to pickup':d.status==='PICKUP'?'Mark delivered':'Completed'}</button>
                     </div>
-                    <div className="mt-4 bg-white rounded-xl border border-stone-200 p-3">
+                    <div className="mt-4 bg-[#FCFCF9] rounded-xl border border-stone-200 p-3">
                       <StatusStepper status={d.status} />
-                      {d.status === 'CLAIMED' && <div className="mt-2 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">Your donation has been claimed. 🎉 Prepare for pickup — beneficiary will arrive soon.</div>}
-                      {d.status === 'DELIVERED' && <div className="mt-2 text-xs font-bold text-[#16A34A] bg-[#F0FDF4] border border-green-200 rounded-lg px-3 py-2">Delivered • FoodLoop completed! Thank you for reducing waste. ♻🏘️</div>}
+                      {d.status==='CLAIMED' && <div className="mt-2.5 text-xs font-medium text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">Claimed — prepare for pickup during the stated window.</div>}
+                      {d.status==='DELIVERED' && <div className="mt-2.5 text-xs font-medium text-leaf bg-[#F0FDF4] border border-green-200 rounded-xl px-3 py-2">Delivered — thank you for completing the loop.</div>}
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             )}
-          </div>
+          </motion.div>
 
-          {/* How it works */}
           <div className="space-y-4">
-            <div className="bg-white rounded-[24px] border border-stone-200 p-6 shadow-sm">
-              <h3 className="font-extrabold text-stone-900">How status works</h3>
-              <div className="mt-3 space-y-2 text-sm">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="bg-stone-900 rounded-2xl p-6 text-white">
+              <div className="text-[11px] font-semibold tracking-widest text-white/50">HOW STATUS WORKS</div>
+              <div className="mt-2 text-sm leading-relaxed text-white/80">When a kitchen claims your food, you’ll see <em className="text-white not-italic">Claimed</em>. Move it to Pickup then Delivered so both sides have a clear record.</div>
+              <div className="mt-4 bg-white/[0.08] rounded-xl p-3 border border-white/10">
+                <div className="text-sm font-medium">Tip</div>
+                <div className="text-xs opacity-60 leading-relaxed mt-1">Add listings via “Add Available Food” — they appear live on the beneficiary map via Supabase realtime.</div>
+              </div>
+            </motion.div>
+
+            <details className="group bg-white rounded-2xl border border-stone-200">
+              <summary className="list-none flex items-center justify-between p-5 cursor-pointer">
+                <h3 className="font-semibold text-stone-900 text-sm">Status guide</h3>
+                <span className="w-7 h-7 rounded-full bg-stone-100 grid place-items-center text-stone-500 group-open:rotate-180 transition-transform">⌄</span>
+              </summary>
+              <div className="px-5 pb-5 -mt-1 space-y-2.5 text-sm border-t border-stone-100 pt-4">
                 {[
-                  { k: 'AVAILABLE', d: 'Food appears on FoodLoop map for nearby beneficiaries' },
-                  { k: 'CLAIMED', d: 'Beneficiary tapped Claim — you prepare for pickup' },
-                  { k: 'PICKUP', d: 'Beneficiary is on the way / picking up' },
-                  { k: 'DELIVERED', d: 'Loop completed — meals saved, waste prevented' },
-                ].map(s => (
+                  { k: 'AVAILABLE', d: 'Visible on the map for nearby kitchens' },
+                  { k: 'CLAIMED', d: 'A kitchen requested it — prepare for pickup' },
+                  { k: 'PICKUP', d: 'Kitchen is collecting' },
+                  { k: 'DELIVERED', d: 'Loop completed' },
+                ].map(s=> (
                   <div key={s.k} className="flex gap-3">
-                    <span className="shrink-0 text-[11px] font-black tracking-widest bg-stone-900 text-white px-2 py-1 rounded-full h-fit">{s.k}</span>
-                    <span className="text-stone-600 leading-relaxed">{s.d}</span>
+                    <span className="shrink-0 text-[11px] font-semibold tracking-widest bg-stone-900 text-white px-2 py-1 rounded-full h-fit">{s.k}</span>
+                    <span className="text-stone-600 leading-relaxed text-sm">{s.d}</span>
                   </div>
                 ))}
               </div>
-            </div>
-
-            <div className="bg-stone-900 rounded-[24px] p-6 text-white">
-              <div className="text-xs font-black tracking-widest text-white/60">YOUR LOOP • REAL-TIME</div>
-              <div className="mt-3 flex items-center gap-2 text-sm font-bold">
-                <span className="w-8 h-8 rounded-full bg-white text-stone-900 grid place-items-center">🍽️</span>
-                <span>You</span>
-                <span className="flex-1 h-[2px] bg-white/20" />
-                <span className="w-8 h-8 rounded-full bg-[#16A34A] grid place-items-center">♻</span>
-                <span className="flex-1 h-[2px] bg-white/20" />
-                <span className="w-8 h-8 rounded-full bg-sky-500 grid place-items-center">🤝</span>
-              </div>
-              <div className="mt-3 text-xs leading-relaxed text-white/70">When a beneficiary claims your food, this dashboard updates instantly. You can then advance to Pickup → Delivered and see the impact.</div>
-            </div>
+            </details>
           </div>
         </div>
       </div>

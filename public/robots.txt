@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /restaurant/
+Disallow: /beneficiary/
+Disallow: /login
+Disallow: /register/
+
+Sitemap: https://foodloop.org/sitemap.xml
