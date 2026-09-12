@@ -16,9 +16,10 @@ Copy `.env.example` to `.env` and fill in the values:
 ```
 VITE_SUPABASE_URL=https://xxxx.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_CARTO_API_KEY=your-carto-basemaps-api-key
 ```
 
-> Never commit `.env`. It is already git-ignored.
+> Never commit `.env`. It is already git-ignored. `VITE_CARTO_API_KEY` is your CARTO basemaps API key (`carto.com/basemaps` → API keys) and is read via `import.meta.env` in `src/lib/carto.ts` — tiles fall back to public `light_all` if unset.
 
 ### 3. Create the database tables
 

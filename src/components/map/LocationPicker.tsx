@@ -4,6 +4,7 @@ import L from 'leaflet'
 import { motion, AnimatePresence } from 'motion/react'
 import { searchNominatim, reverseNominatim, type NominatimResult } from '../../lib/nominatim'
 import { CENTER } from '../../lib/distance'
+import { cartoTileUrl, cartoErrorTileUrl } from '../../lib/carto'
 
 export type LocationValue = {
   lat: number | null
@@ -233,9 +234,10 @@ export function LocationPicker({
         >
           <TileLayer
             attribution='&copy; OpenStreetMap &copy; CARTO'
-            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+            url={cartoTileUrl('light_all')}
             subdomains={['a', 'b', 'c', 'd']}
             maxZoom={18}
+            errorTileUrl={cartoErrorTileUrl('light_all')}
           />
           <MapClickHandler onPick={handleMapPick} />
           <Recenter lat={value.lat} lng={value.lng} />

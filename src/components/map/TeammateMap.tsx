@@ -8,6 +8,7 @@ import 'leaflet/dist/leaflet.css'
 import type { Donation } from '../../lib/types'
 import { useEffect, useMemo, useRef } from 'react'
 import { CENTER } from '../../lib/distance'
+import { cartoTileUrl, cartoErrorTileUrl } from '../../lib/carto'
 
 // Fix default icon once (outside component to avoid flash)
  // @ts-expect-error leaflet internals
@@ -95,13 +96,13 @@ export function TeammateMap({
         wheelDebounceTime={40}
         wheelPxPerZoomLevel={80}
       >
-        {/* Carto Light — muted, low noise */}
+        {/* Carto Light — muted, low noise (uses VITE_CARTO_API_KEY via ?key=) */}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          url={cartoTileUrl('light_all')}
           subdomains={['a','b','c','d']}
           maxZoom={18}
-          errorTileUrl="https://{s}.basemaps.cartocdn.com/light_all/12/0/0.png"
+          errorTileUrl={cartoErrorTileUrl('light_all')}
         />
         <MapController selectedId={selectedId} donations={donations} />
         {donations.map((d) => (
