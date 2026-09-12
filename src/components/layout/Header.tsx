@@ -31,7 +31,7 @@ export function Header({ transparent }: { transparent?: boolean }) {
               >
                 Dashboard
               </Link>
-              <button onClick={() => { logout(); nav('/') }} className="text-sm font-medium text-stone-500 hover:text-stone-900 px-3 py-2">Log out</button>
+              <button onClick={() => { void logout(); nav('/') }} className="text-sm font-medium text-stone-500 hover:text-stone-900 px-3 py-2">Log out</button>
             </>
           )}
         </nav>

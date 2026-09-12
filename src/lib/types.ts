@@ -8,7 +8,6 @@ export interface User {
   location: string
   contact: string
   email: string
-  password: string
 }
 
 export interface Donation {

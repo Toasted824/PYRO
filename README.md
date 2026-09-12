@@ -1,32 +1,55 @@
-# React + TypeScript + Vite
+# FoodLoop
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Surplus food, shared with the community. Restaurants post surplus meals; beneficiary organizations find and claim them nearby. Auth and data are backed by **Supabase**.
 
-Currently, two official plugins are available:
+## Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### 1. Create a Supabase project
 
-## React Compiler
+1. Go to [supabase.com](https://supabase.com), create a project.
+2. Copy the **Project URL** and the **anon/public** key from *Project Settings → API*.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 2. Configure the app
 
-## Expanding the Oxlint configuration
+Copy `.env.example` to `.env` and fill in the values:
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```
+VITE_SUPABASE_URL=https://xxxx.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+> Never commit `.env`. It is already git-ignored.
+
+### 3. Create the database tables
+
+Open the **SQL editor** in your Supabase dashboard, paste the contents of
+[`supabase/migrations/0001_init.sql`](./supabase/migrations/0001_init.sql), and run it.
+This creates the `donations` table, enables Realtime, and sets up row-level security.
+
+### 4. Authentication
+
+FoodLoop uses Supabase Auth (email + password). No extra setup is needed beyond creating
+the tables. By default Supabase asks users to confirm their email — accounts created in
+the app will show a "check your inbox" message and log you in after confirmation. You can
+disable email confirmation under *Authentication → Providers → Email* if you prefer instant logins.
+
+### 5. Run
+
+```bash
+npm install
+npm run dev
+```
+
+## Scripts
+
+- `npm run dev` — start Vite dev server
+- `npm run build` — typecheck + production build
+- `npm run lint` — run oxlint
+- `npm run preview` — preview the production build
+
+## The loop
+
+1. **Restaurant** signs up and posts surplus food (`/restaurant/new`).
+2. The donation appears on the public map (`/explore`) and to beneficiary dashboards in real time.
+3. **Beneficiary** signs up, finds the donation, and claims it.
+4. **Restaurant** advances the status: Claimed → Pickup → Delivered.

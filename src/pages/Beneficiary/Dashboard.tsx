@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useAuth } from '../../lib/auth'
-import { mockStore } from '../../lib/mockStore'
+import { claimDonation } from '../../lib/store'
+import { useDonations } from '../../hooks/useDonations'
 import { Header } from '../../components/layout/Header'
 import { TeammateMap } from '../../components/map/TeammateMap'
 import { StatusStepper } from '../../components/ui/StatusStepper'
@@ -16,21 +17,12 @@ function kmAway(d: Donation) {
 }
 
 export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
-  const { user } = useAuth()
-  const [donations, setDonations] = useState<Donation[]>(() => mockStore.getDonations())
+  const { user, configured } = useAuth()
+  const { donations, loading, error, reload } = useDonations()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [showClaimed, setShowClaimed] = useState(false)
-
-  const refresh = () => setDonations([...mockStore.getDonations()])
-
-  useEffect(() => {
-    const h = () => refresh()
-    window.addEventListener('foodloop:donations', h)
-    window.addEventListener('storage', h)
-    const iv = setInterval(refresh, 2000)
-    return () => { window.removeEventListener('foodloop:donations', h); window.removeEventListener('storage', h); clearInterval(iv) }
-  }, [])
+  const [claiming, setClaiming] = useState(false)
 
   const available = useMemo(() => {
     let list = donations.filter(d => d.status === 'AVAILABLE')
@@ -38,30 +30,33 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
       const q = search.toLowerCase()
       list = list.filter(d => d.foodType.toLowerCase().includes(q) || d.restaurantName.toLowerCase().includes(q) || d.pickupLocation.toLowerCase().includes(q))
     }
-    return list.sort((a,b)=> distanceFromCenter(a.lat,a.lng) - distanceFromCenter(b.lat,b.lng))
+    return list.sort((a, b) => distanceFromCenter(a.lat, a.lng) - distanceFromCenter(b.lat, b.lng))
   }, [donations, search])
 
   const myClaimed = useMemo(() => {
     if (!user) return []
-    return donations.filter(d => d.claimedBy === user.id).sort((a,b)=> new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    return donations.filter(d => d.claimedBy === user.id).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   }, [donations, user])
 
-  const selected = donations.find(d=> d.id === selectedId) || null
+  const selected = donations.find(d => d.id === selectedId) || null
 
-  const claim = (d: Donation) => {
+  const claim = async (d: Donation) => {
     if (publicMode) {
       pushToast('Please log in as Beneficiary to claim food', 'info')
       return
     }
     if (!user) { pushToast('Please log in as Beneficiary', 'info'); return }
     if (user.role !== 'beneficiary') { pushToast('Only beneficiaries can claim food', 'info'); return }
+    setClaiming(true)
     try {
-      mockStore.claimDonation(d.id, user.id, user.name)
+      await claimDonation(d.id, user)
       pushToast('Food claimed successfully. 🎉')
-      refresh()
+      reload()
       setSelectedId(d.id)
     } catch (e: unknown) {
       pushToast(e instanceof Error ? e.message : 'Claim failed', 'info')
+    } finally {
+      setClaiming(false)
     }
   }
 
@@ -79,10 +74,10 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
           <div className="flex items-center gap-2 flex-1 justify-end max-w-[560px]">
             <div className="relative flex-1 max-w-[360px]">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400">⌕</span>
-              <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search food, restaurant, area..." className="w-full rounded-full border border-stone-200 bg-stone-50 pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500" />
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search food, restaurant, area..." className="w-full rounded-full border border-stone-200 bg-stone-50 pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500" />
             </div>
             {!publicMode && user && (
-              <button onClick={() => setShowClaimed(v=>!v)} className={`hidden sm:inline-flex text-xs font-bold px-4 py-2 rounded-full border transition ${showClaimed ? 'bg-stone-900 text-white border-stone-900' : 'bg-white border-stone-200 hover:bg-stone-50'}`}>
+              <button onClick={() => setShowClaimed(v => !v)} className={`hidden sm:inline-flex text-xs font-bold px-4 py-2 rounded-full border transition ${showClaimed ? 'bg-stone-900 text-white border-stone-900' : 'bg-white border-stone-200 hover:bg-stone-50'}`}>
                 {myClaimed.length ? `Claimed (${myClaimed.length})` : 'Claimed'} {showClaimed ? '• showing' : ''}
               </button>
             )}
@@ -102,10 +97,18 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
           </div>
 
           <div className="flex-1 overflow-auto p-3 space-y-3 bg-stone-50/50">
+            {!configured && (
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 text-xs text-amber-900">
+                <span className="font-bold">Supabase not connected.</span> Add your project credentials to .env (see README).
+              </div>
+            )}
+            {error && !loading && <div className="bg-red-50 border border-red-200 text-red-700 text-xs px-3 py-2 rounded-xl">{error}</div>}
+            {loading && donations.length === 0 && <div className="text-center py-10 text-sm text-stone-500">Loading available food…</div>}
+
             {showClaimed && myClaimed.length > 0 && (
               <div className="space-y-2">
                 <div className="text-[11px] font-black tracking-widest text-sky-700">MY CLAIMED</div>
-                {myClaimed.map(d=> (
+                {myClaimed.map(d => (
                   <div key={d.id} className="bg-sky-50 border border-sky-200 rounded-2xl p-3">
                     <div className="flex items-center gap-2 text-xs font-bold text-sky-700"><span className="w-2 h-2 rounded-full bg-sky-500" /> CLAIMED • {d.meals} meals</div>
                     <div className="font-bold text-stone-900 text-sm mt-1">{d.restaurantName} • {d.foodType}</div>
@@ -113,7 +116,7 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
                     <div className="mt-2 bg-white rounded-xl border border-sky-100 p-2">
                       <StatusStepper status={d.status} compact />
                     </div>
-                    <div className="mt-2 text-xs font-semibold text-sky-700 bg-white border border-sky-200 rounded-lg px-2 py-1">Donation claimed. 🎉 {d.status==='CLAIMED'?'Next: pickup at location': d.status}</div>
+                    <div className="mt-2 text-xs font-semibold text-sky-700 bg-white border border-sky-200 rounded-lg px-2 py-1">Donation claimed. 🎉 {d.status === 'CLAIMED' ? 'Next: pickup at location' : d.status}</div>
                   </div>
                 ))}
                 <div className="h-[1px] bg-stone-200 my-2" />
@@ -121,30 +124,30 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
               </div>
             )}
 
-            {available.length === 0 ? (
+            {!loading && available.length === 0 && !error && (
               <div className="text-center py-10">
                 <div className="text-3xl">😋</div>
                 <div className="mt-2 font-bold text-stone-900">No matches</div>
                 <div className="text-sm text-stone-500">Try a different search or check back soon</div>
               </div>
-            ) : (
-              available.map(d=> (
-                <div key={d.id} onClick={()=>setSelectedId(d.id)} className={`rounded-2xl border p-4 cursor-pointer transition text-left ${selectedId===d.id ? 'bg-sky-50 border-sky-300 shadow' : 'bg-white border-stone-200 hover:border-stone-300 hover:shadow-sm'}`}>
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="w-10 h-10 rounded-xl bg-[#F0FDF4] border border-green-200 grid place-items-center text-sm">🍲</div>
-                    <span className="text-[11px] font-black tracking-widest bg-[#F0FDF4] border border-green-200 text-[#16A34A] px-2 py-1 rounded-full">{d.status}</span>
-                  </div>
-                  <div className="mt-2 font-extrabold text-stone-900">{d.meals} meals • {d.foodType}</div>
-                  <div className="text-sm text-stone-600">{d.restaurantName}</div>
-                  <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
-                    <span className="bg-stone-900 text-white px-2 py-1 rounded-full font-semibold">{kmAway(d)} km away</span>
-                    <span className="bg-amber-100 border border-amber-200 text-amber-800 px-2 py-1 rounded-full font-semibold">Pickup by {fmtUntil(d.availableUntil)}</span>
-                  </div>
-                  <div className="text-xs text-stone-500 mt-2 line-clamp-2">{d.pickupLocation} • {d.description}</div>
-                  <button onClick={(e)=>{e.stopPropagation(); setSelectedId(d.id)}} className={`mt-3 w-full font-bold py-2 rounded-full text-sm transition ${selectedId===d.id ? 'bg-sky-500 text-white' : 'bg-stone-900 text-white hover:bg-black'}`}>View →</button>
-                </div>
-              ))
             )}
+
+            {available.map(d => (
+              <div key={d.id} onClick={() => setSelectedId(d.id)} className={`rounded-2xl border p-4 cursor-pointer transition text-left ${selectedId === d.id ? 'bg-sky-50 border-sky-300 shadow' : 'bg-white border-stone-200 hover:border-stone-300 hover:shadow-sm'}`}>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="w-10 h-10 rounded-xl bg-[#F0FDF4] border border-green-200 grid place-items-center text-sm">🍲</div>
+                  <span className="text-[11px] font-black tracking-widest bg-[#F0FDF4] border border-green-200 text-[#16A34A] px-2 py-1 rounded-full">{d.status}</span>
+                </div>
+                <div className="mt-2 font-extrabold text-stone-900">{d.meals} meals • {d.foodType}</div>
+                <div className="text-sm text-stone-600">{d.restaurantName}</div>
+                <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
+                  <span className="bg-stone-900 text-white px-2 py-1 rounded-full font-semibold">{kmAway(d)} km away</span>
+                  <span className="bg-amber-100 border border-amber-200 text-amber-800 px-2 py-1 rounded-full font-semibold">Pickup by {fmtUntil(d.availableUntil)}</span>
+                </div>
+                <div className="text-xs text-stone-500 mt-2 line-clamp-2">{d.pickupLocation} • {d.description}</div>
+                <button onClick={(e) => { e.stopPropagation(); setSelectedId(d.id) }} className={`mt-3 w-full font-bold py-2 rounded-full text-sm transition ${selectedId === d.id ? 'bg-sky-500 text-white' : 'bg-stone-900 text-white hover:bg-black'}`}>View →</button>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -171,11 +174,11 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
                     <StatusStepper status={selected.status} />
                   </div>
                 </div>
-                <button onClick={()=>setSelectedId(null)} className="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 grid place-items-center text-stone-600">×</button>
+                <button onClick={() => setSelectedId(null)} className="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 grid place-items-center text-stone-600">×</button>
               </div>
               <div className="mt-4 flex gap-3">
                 {selected.status === 'AVAILABLE' ? (
-                  <button onClick={()=>claim(selected)} className="flex-1 bg-[#16A34A] hover:bg-[#15803D] text-white font-extrabold py-3 rounded-full shadow transition">Claim Food →</button>
+                  <button onClick={() => claim(selected)} disabled={claiming} className="flex-1 bg-[#16A34A] hover:bg-[#15803D] disabled:bg-stone-300 disabled:cursor-not-allowed text-white font-extrabold py-3 rounded-full shadow transition">{claiming ? 'Claiming…' : 'Claim Food →'}</button>
                 ) : (
                   <div className="flex-1 bg-amber-50 border border-amber-200 text-amber-800 font-bold py-3 rounded-full text-center">Claimed by {selected.claimedByName || 'someone'} • {selected.status}</div>
                 )}

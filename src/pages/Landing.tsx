@@ -10,7 +10,7 @@ export function Landing() {
         <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-8 items-center">
           <div>
             <div className="inline-flex items-center gap-2 bg-white border border-stone-200 rounded-full px-3 py-1 text-xs font-semibold text-stone-600 shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-[#16A34A] animate-pulse" /> Live in Kathmandu Valley • 24 restaurants sharing today
+              <span className="w-2 h-2 rounded-full bg-[#16A34A] animate-pulse" /> Real surplus food, shared live with the community
             </div>
             <h1 className="mt-4 text-[40px] sm:text-[56px] font-black leading-[0.9] tracking-tight text-stone-900">
               Surplus food,<br />
@@ -48,7 +48,7 @@ export function Landing() {
                   <div className="font-extrabold text-stone-900 leading-none">RESTAURANT</div>
                   <div className="text-xs text-amber-800 font-medium">has surplus food</div>
                 </div>
-                <div className="text-xs font-bold bg-white border border-amber-200 px-2.5 py-1 rounded-full">20 meals</div>
+                <div className="text-xs font-bold bg-white border border-amber-200 px-2.5 py-1 rounded-full">live surplus</div>
               </div>
 
               <div className="flex flex-col items-center py-1">
@@ -79,27 +79,13 @@ export function Landing() {
                   <div className="font-extrabold text-stone-900 leading-none">BENEFICIARY</div>
                   <div className="text-xs text-sky-700 font-medium">finds food nearby</div>
                 </div>
-                <div className="text-xs font-bold bg-sky-500 text-white px-2.5 py-1 rounded-full">2.1 km away</div>
+                <div className="text-xs font-bold bg-sky-500 text-white px-2.5 py-1 rounded-full">found nearby</div>
               </div>
 
               <div className="w-[2px] h-6 bg-sky-200" />
               <div className="w-full bg-stone-900 rounded-2xl p-3 flex items-center justify-center gap-2 text-white">
                 <span className="text-sm">🏘️</span>
                 <span className="font-extrabold tracking-widest text-xs">COMMUNITY • NO WASTE • IMPACT</span>
-              </div>
-            </div>
-            <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-              <div className="bg-[#FFFBEB] rounded-xl p-2 border border-amber-100">
-                <div className="font-black text-lg text-stone-900">1.2k</div>
-                <div className="text-[10px] font-bold tracking-widest text-stone-500">MEALS SAVED</div>
-              </div>
-              <div className="bg-[#F0FDF4] rounded-xl p-2 border border-green-100">
-                <div className="font-black text-lg text-[#16A34A]">89</div>
-                <div className="text-[10px] font-bold tracking-widest text-stone-500">RESTAURANTS</div>
-              </div>
-              <div className="bg-sky-50 rounded-xl p-2 border border-sky-100">
-                <div className="font-black text-lg text-sky-600">342</div>
-                <div className="text-[10px] font-bold tracking-widest text-stone-500">FAMILIES</div>
               </div>
             </div>
           </div>
@@ -127,11 +113,11 @@ export function Landing() {
             <div className="flex items-center gap-3">
               <span className="w-10 h-10 rounded-full bg-white/15 grid place-items-center">🎯</span>
               <div>
-                <div className="font-bold leading-none">Ready for the hackathon demo?</div>
-                <div className="text-xs opacity-70">Follow the 10-step FoodLoop journey — mock data ready, no backend needed.</div>
+                <div className="font-bold leading-none">Surplus food deserves a second life</div>
+                <div className="text-xs opacity-70">Create an account, share real surplus, and track every meal end-to-end.</div>
               </div>
             </div>
-            <Link to="/join" className="bg-white text-stone-900 font-extrabold px-6 py-2.5 rounded-full text-sm hover:bg-stone-100 transition">Start demo →</Link>
+            <Link to="/join" className="bg-white text-stone-900 font-extrabold px-6 py-2.5 rounded-full text-sm hover:bg-stone-100 transition">Join the loop →</Link>
           </div>
         </div>
       </section>
