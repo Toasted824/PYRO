@@ -39,10 +39,12 @@ export function Header({ transparent }: { transparent?: boolean }) {
             <>
               <span className="hidden md:inline-flex items-center gap-2 text-sm bg-stone-900 text-white px-3 py-1.5 rounded-md">
                 {user.name}
-                <span className="opacity-60 text-xs capitalize">· {user.role}</span>
               </span>
               <Link to={user.role === 'restaurant' ? '/restaurant/dashboard' : '/beneficiary/dashboard'} className="inline-flex text-sm font-medium bg-white border border-stone-200 px-4 py-2 rounded-lg hover:bg-stone-50 transition-colors">
                 Dashboard
+              </Link>
+              <Link to={user.role === 'restaurant' ? '/restaurant/profile' : '/beneficiary/profile'} className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium bg-white border border-stone-200 px-4 py-2 rounded-full hover:bg-stone-50 transition-colors">
+                Profile
               </Link>
               <button onClick={() => { logout(); nav('/') }} className="text-sm font-medium text-stone-500 hover:text-stone-900 px-3 py-2">
                 Log out

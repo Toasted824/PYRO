@@ -16,6 +16,8 @@ const RegisterBeneficiary = lazy(() => import('./pages/Auth/RegisterBeneficiary'
 const CreateDonation = lazy(() => import('./pages/Restaurant/CreateDonation').then(m => ({ default: m.CreateDonation })))
 const RestaurantDashboard = lazy(() => import('./pages/Restaurant/Dashboard').then(m => ({ default: m.RestaurantDashboard })))
 const BeneficiaryDashboard = lazy(() => import('./pages/Beneficiary/Dashboard').then(m => ({ default: m.BeneficiaryDashboard })))
+const BeneficiaryProfile = lazy(() => import('./pages/Beneficiary/Profile').then(m => ({ default: m.BeneficiaryProfile })))
+const RestaurantProfile = lazy(() => import('./pages/Restaurant/Profile').then(m => ({ default: m.RestaurantProfile })))
 const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })))
 
 function Fallback() {
@@ -45,7 +47,9 @@ function AnimatedRoutes() {
           <Route path="/register/beneficiary" element={<RegisterBeneficiary />} />
           <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
           <Route path="/restaurant/new" element={<CreateDonation />} />
+          <Route path="/restaurant/profile" element={<RestaurantProfile />} />
           <Route path="/beneficiary/dashboard" element={<BeneficiaryDashboard />} />
+          <Route path="/beneficiary/profile" element={<BeneficiaryProfile />} />
           <Route path="/explore" element={<BeneficiaryDashboard publicMode />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
