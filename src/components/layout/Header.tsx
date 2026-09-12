@@ -11,9 +11,7 @@ export function Header({ transparent }: { transparent?: boolean }) {
       </a>
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 h-[64px] flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2.5">
-          <span className="w-9 h-9 rounded-lg bg-leaf flex items-center justify-center text-white text-[13px] font-black tracking-tight">
-            FL
-          </span>
+          <img src="/logo.png" alt="FoodLoop logo" className="w-9 h-9 object-contain" />
           <span className="font-bold tracking-tight text-[19px] text-stone-900">FoodLoop</span>
           <span className="hidden sm:inline text-[11px] font-semibold tracking-widest text-stone-500 bg-stone-100 px-2 py-0.5 rounded-md">
             Kathmandu Valley
@@ -46,7 +44,7 @@ export function Header({ transparent }: { transparent?: boolean }) {
               <Link to={user.role === 'restaurant' ? '/restaurant/dashboard' : '/beneficiary/dashboard'} className="inline-flex text-sm font-medium bg-white border border-stone-200 px-4 py-2 rounded-lg hover:bg-stone-50 transition-colors">
                 Dashboard
               </Link>
-              <Link to={user.role === 'restaurant' ? '/restaurant/profile' : '/beneficiary/profile'} className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium bg-white border border-stone-200 px-4 py-2 rounded-full hover:bg-stone-50 transition-colors">
+              <Link to={user.role === 'restaurant' ? '/restaurant/profile' : '/beneficiary/profile'} className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium bg-white border border-stone-200 px-4 py-2 rounded-lg hover:bg-stone-50 transition-colors">
                 Profile
               </Link>
               <button onClick={() => { logout(); nav('/') }} className="text-sm font-medium text-stone-500 hover:text-stone-900 px-3 py-2">

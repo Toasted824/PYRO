@@ -163,11 +163,12 @@ export function Landing() {
           <div aria-hidden="true" className="hero-blob -top-[180px] left-1/2 -translate-x-1/2 hidden sm:block" />
           <div aria-hidden="true" className="hero-blob -top-[120px] left-1/2 -translate-x-1/2 sm:hidden" style={{ width: 360, height: 360 }} />
           <div className="relative max-w-[860px] mx-auto px-4 sm:px-6 pt-14 sm:pt-24 pb-10 sm:pb-14 text-center">
-            <div className="motion-fade-up inline-flex items-center gap-2 bg-white border border-stone-200 rounded-full px-4 py-1.5 text-xs font-semibold text-stone-600 shadow-sm">
+            <img src="/logo.png" alt="FoodLoop logo" className="motion-fade-up mx-auto h-[110px] w-auto drop-shadow-sm" width="139" height="110" />
+            <div className="motion-fade-up motion-delay-1 mt-6 inline-flex items-center gap-2 bg-white border border-stone-200 rounded-full px-4 py-1.5 text-xs font-semibold text-stone-600 shadow-sm">
               <span className="w-2 h-2 bg-leaf rounded-full relative leaf-pulse" aria-hidden="true" /> Available in Kathmandu Valley
             </div>
 
-            <h1 className="motion-fade-up motion-delay-1 mt-6 font-display font-extrabold tracking-tight text-stone-900 leading-[0.9] text-[38px] sm:text-[60px] lg:text-[68px]">
+            <h1 className="motion-fade-up motion-delay-2 mt-6 font-display font-extrabold tracking-tight text-stone-900 leading-[0.9] text-[38px] sm:text-[60px] lg:text-[68px]">
               Good food
               <br />
               <span className="text-leaf">shouldn&apos;t be wasted</span>
@@ -206,7 +207,9 @@ export function Landing() {
       <section className="max-w-[1100px] mx-auto px-4 sm:px-6 pb-8" aria-label="Example listing">
         <div className="motion-fade-up bg-white/80 backdrop-blur rounded-2xl border border-stone-200 p-4 sm:p-5 flex flex-col sm:flex-row gap-4 items-start sm:items-center shadow-sm hover:shadow-md hover:-translate-y-[1px] transition-all duration-200">
           <div className="flex items-center gap-3 shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-[#F0FDF4] border border-green-200 grid place-items-center text-[11px] font-black text-leaf">FL</div>
+            <div className="w-10 h-10 rounded-xl bg-[#F0FDF4] border border-green-200 grid place-items-center">
+              <img src="/logo.png" alt="" className="w-6 h-6 object-contain" />
+            </div>
             <div className="hidden sm:block w-px h-10 bg-stone-200" aria-hidden="true" />
           </div>
           <div className="flex-1 min-w-0">
