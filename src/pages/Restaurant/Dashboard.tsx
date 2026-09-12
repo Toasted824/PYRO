@@ -19,17 +19,18 @@ function timeLeft(iso: string) {
 }
 
 export function RestaurantDashboard() {
-  const { user, configured } = useAuth()
+  const { user, initializing, configured } = useAuth()
   const nav = useNavigate()
   const { donations, loading, error, reload } = useDonations()
   const [confirmingId, setConfirmingId] = useState<string | null>(null)
 
   useEffect(() => {
+    if (initializing) return
     if (!user) nav('/login?role=restaurant')
     else if (user.role !== 'restaurant') nav('/beneficiary/dashboard')
-  }, [user, nav])
+  }, [user, initializing, nav])
 
-  if (!user) return null
+  if (initializing || !user) return null
 
   const myDonations = donations.filter(d => d.restaurantId === user.id).sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),

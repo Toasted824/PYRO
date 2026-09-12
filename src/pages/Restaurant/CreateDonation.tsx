@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../lib/auth'
 import { createDonation } from '../../lib/store'
@@ -8,17 +8,19 @@ import { LocationPicker, type LocationValue } from '../../components/map/Locatio
 import { pushToast } from '../../components/ui/Toast'
 
 export function CreateDonation() {
-  const { user, configured } = useAuth()
+  const { user, initializing, configured } = useAuth()
   const nav = useNavigate()
   const [form, setForm] = useState({ foodType: FOOD_TYPES[0], meals: '10', availableUntil: '', description: '' })
   const [location, setLocation] = useState<LocationValue>({ lat: null, lng: null, label: '' })
   const [err, setErr] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  if (!user || user.role !== 'restaurant') {
-    nav('/login?role=restaurant')
-    return null
-  }
+  useEffect(() => {
+    if (initializing) return
+    if (!user || user.role !== 'restaurant') nav('/login?role=restaurant')
+  }, [user, initializing, nav])
+
+  if (initializing || !user || user.role !== 'restaurant') return null
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()

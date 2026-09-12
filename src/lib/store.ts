@@ -116,12 +116,14 @@ export async function claimDonation(donationId: string, user: User): Promise<Don
 
 export async function deleteDonation(donationId: string): Promise<void> {
   if (!supabase) throw new Error('Supabase is not configured yet. Add your credentials in .env.')
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('donations')
     .delete()
     .eq('id', donationId)
     .eq('status', 'AVAILABLE')
+    .select()
   if (error) throw error
+  if (!data || data.length === 0) throw new Error('Donation not found or already claimed — cannot delete')
 }
 
 export async function updateDonationStatus(donationId: string, status: DonationStatus): Promise<Donation> {

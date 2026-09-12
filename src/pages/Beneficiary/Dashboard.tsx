@@ -37,8 +37,13 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
 
   const myClaimed = useMemo(() => {
     if (!user) return []
-    return donations.filter(d => d.claimedBy === user.id).sort((a,b)=> new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-  }, [donations, user])
+    let list = donations.filter(d => d.claimedBy === user.id)
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      list = list.filter(d => d.foodType.toLowerCase().includes(q) || d.restaurantName.toLowerCase().includes(q) || d.pickupLocation.toLowerCase().includes(q))
+    }
+    return list.sort((a,b)=> new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  }, [donations, user, search])
 
   const selected = donations.find(d=> d.id === selectedId) || null
   const list = tab === 'claimed' ? myClaimed : available
@@ -227,7 +232,7 @@ export function BeneficiaryDashboard({ publicMode }: { publicMode?: boolean }) {
           </AnimatePresence>
 
           <div className="h-[360px] sm:h-[420px] lg:h-auto lg:flex-1 min-h-[360px] lg:min-h-[420px] rounded-2xl overflow-hidden border border-stone-200 shadow-sm bg-[#F7F5EF]">
-            <TeammateMap donations={available} onMarkerClick={setSelectedId} selectedId={selectedId} />
+            <TeammateMap donations={list} onMarkerClick={setSelectedId} selectedId={selectedId} />
           </div>
 
           {!selected && (
