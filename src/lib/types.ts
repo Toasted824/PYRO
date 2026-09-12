@@ -12,11 +12,14 @@ export interface User {
   email: string
 }
 
+export type Perishability = 'perishable' | 'non_perishable'
+
 export interface Donation {
   id: string
   restaurantId: string
   restaurantName: string
   foodType: string
+  perishability: Perishability
   meals: number
   availableUntil: string
   pickupLocation: string
@@ -37,3 +40,12 @@ export const FOOD_TYPES = [
   'Packaged Food',
   'Mixed Surplus',
 ] as const
+
+export const FOOD_TYPE_DEFAULT_PERISHABILITY: Record<string, Perishability> = {
+  'Cooked Meals': 'perishable',
+  'Bakery & Bread': 'perishable',
+  'Fresh Produce': 'perishable',
+  'Dairy': 'perishable',
+  'Packaged Food': 'non_perishable',
+  'Mixed Surplus': 'perishable',
+}

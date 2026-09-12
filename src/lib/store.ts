@@ -1,11 +1,12 @@
 import { supabase } from './supabase'
-import type { Donation, DonationStatus, User } from './types'
+import type { Donation, DonationStatus, Perishability, User } from './types'
 
 interface DonationRow {
   id: string
   restaurant_id: string
   restaurant_name: string
   food_type: string
+  perishability: string | null
   meals: number
   available_until: string
   pickup_location: string
@@ -24,12 +25,18 @@ function normalizeStatus(s: string): DonationStatus {
   return 'AVAILABLE'
 }
 
+function normalizePerishability(s: string | null): Perishability {
+  if (s === 'non_perishable') return 'non_perishable'
+  return 'perishable'
+}
+
 function toDonation(row: DonationRow): Donation {
   return {
     id: row.id,
     restaurantId: row.restaurant_id,
     restaurantName: row.restaurant_name,
     foodType: row.food_type,
+    perishability: normalizePerishability(row.perishability),
     meals: row.meals,
     availableUntil: row.available_until,
     pickupLocation: row.pickup_location,
@@ -43,7 +50,7 @@ function toDonation(row: DonationRow): Donation {
   }
 }
 
-const DONATION_SELECT = 'id,restaurant_id,restaurant_name,food_type,meals,available_until,pickup_location,description,status,claimed_by,claimed_by_name,lat,lng,created_at'
+const DONATION_SELECT = 'id,restaurant_id,restaurant_name,food_type,perishability,meals,available_until,pickup_location,description,status,claimed_by,claimed_by_name,lat,lng,created_at'
 
 export async function fetchDonations(): Promise<Donation[]> {
   if (!supabase) throw new Error('Supabase is not configured yet. Add your credentials in .env.')
@@ -72,6 +79,7 @@ export interface NewDonation {
   restaurantId: string
   restaurantName: string
   foodType: string
+  perishability: Perishability
   meals: number
   availableUntil: string
   pickupLocation: string
@@ -88,6 +96,7 @@ export async function createDonation(input: NewDonation): Promise<Donation> {
       restaurant_id: input.restaurantId,
       restaurant_name: input.restaurantName,
       food_type: input.foodType,
+      perishability: input.perishability,
       meals: input.meals,
       available_until: input.availableUntil,
       pickup_location: input.pickupLocation,
