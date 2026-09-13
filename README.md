@@ -1,6 +1,6 @@
 # FoodLoop
 
-> **Surplus food, shared with the community.**
+> **Good Food should NOT be wasted.**
 
 FoodLoop is a web platform that helps restaurants in **Kathmandu Valley** share surplus food with verified community kitchens and shelters. Restaurants can post available food, beneficiaries can discover nearby listings on an interactive map, and both sides can coordinate pickups through a simple claim-and-status workflow.
 
